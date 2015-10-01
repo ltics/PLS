@@ -31,32 +31,35 @@
                            (map #(s-eval env %) args))))
     :else exp))
 
-(defn meta-eval
+(defn m-eval
   [env exp]
   (letfn [(eval-list [env [op & args :as exp]]
                      (condp = op
                        'let (eval-let env exp)
                        'if (let [[predicate consequent alternative] args]
-                             (if (s-eval env predicate)
-                               (s-eval env consequent)
-                               (s-eval env alternative)))
+                             (if (m-eval env predicate)
+                               (m-eval env consequent)
+                               (m-eval env alternative)))
                        'do (when-not (empty? args)
                              (loop [[f & rst] args]
                                (if (empty? rst)
-                                 (s-eval env f)
+                                 (m-eval env f)
                                  (do
-                                   (s-eval env f)
+                                   (m-eval env f)
                                    (recur rst)))))
-                       (apply (s-eval env op)
-                              (map #(s-eval env %) args))))
+                       (let [op (m-eval env op)
+                             eval-args (map #(m-eval env %) args)]
+                         (if (fn? op)
+                           (apply op eval-args)
+                           (cons op (vec eval-args))))))
           (eval-let [env [_ bindings & body]]
                     (->> (apply list `(do ~@body))
-                         (meta-eval (letbind->env bindings env))))
+                         (m-eval (letbind->env bindings env))))
           ;;this can let mutiple local binds
           (letbind->env [bindings env]
                         (->> (partition 2 bindings)
                              (reduce (fn [env [k v]]
-                                       (assoc env k (meta-eval env v)))
+                                       (assoc env k (m-eval env v)))
                                      env)))]
     (cond
       (nil? exp) exp
@@ -66,8 +69,13 @@
       (fn? exp) exp
       (symbol? exp) (get env exp exp)
       (seq? exp) (eval-list env exp)
-      (map? exp) (into (empty exp) (map (fn [k v]
-                                          [(meta-eval env k)
-                                           (meta-eval env v)]) exp))
-      (coll? exp) (into (empty exp) (map #(meta-eval env %) exp))
+      (map? exp) (into (empty exp) (map (fn [[k v]]
+                                          [(m-eval env k)
+                                           (m-eval env v)]) exp))
+      (coll? exp) (into (empty exp) (map #(m-eval env %) exp))
       :else exp)))
+
+(m-eval {'x 1 'y 2} '(* x (+ (let [z 5] z) 3)))
+(m-eval {'x 1 'y 2} '(+ (let [z 5] z) 3))
+(m-eval {} '{:a 1 :b 2})
+
