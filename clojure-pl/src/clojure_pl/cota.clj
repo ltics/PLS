@@ -1,6 +1,15 @@
 (ns clojure-pl.cota
   (:require [clojure.test :refer :all]))
 
+(def car first)
+(def cdr rest)
+(def cadr #(car (cdr %)))
+(def cddr #(cdr (cdr %)))
+(def caadr #(car (car (cdr %))))
+(def caddr #(car (cdr (cdr %))))
+(def cdadr #(cdr (cadr %)))
+(def cadddr #(car (cdr (cddr %))))
+
 (defmacro is= [& body]
   `(is (= ~@body)))
 
