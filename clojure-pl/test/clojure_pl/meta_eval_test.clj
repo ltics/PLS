@@ -3,6 +3,11 @@
             [clojure-pl.cota :refer :all]
             [clojure-pl.metaeval.s-eval :refer :all]))
 
+(deftest meta-test
+  (testing "read-string should result the same thing with quote"
+    ;;this is why we don't need a lexer and parser in a meta eval system
+    (is= (read-string "(+ 1 2)") '(+ 1 2))))
+
 (deftest s-eval-test
   (testing "nil evals to nil"
     (is= (s-eval {} nil) nil))
