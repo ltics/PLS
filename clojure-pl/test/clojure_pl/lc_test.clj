@@ -12,5 +12,7 @@
     (is= (interp '((lambda (x) (* x 3)) 3)) 9)
     (is= (interp '((lambda (x) (* 2 x)) 3)) 6)
     (is= (interp '(((lambda (x) (lambda (y) (* x y))) 2) 3)) 6)
+    ;;if it is dynamic scoping it will be 8 not 6
     (is= (interp '((lambda (y) (((lambda (y) (lambda (x) (* y 2))) 3) 0)) 4)) 6)
+    (is= (interp '((lambda (y) (((lambda (y) (lambda (x) (* y x))) 3) 3)) 4)) 9)
     (is= (interp '(1 2)) "no matching clause")))
