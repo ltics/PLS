@@ -38,7 +38,8 @@
                           '+ (+ v1 v2)
                           '- (- v1 v2)
                           '* (* v1 v2)
-                          '/ (/ v1 v2)))))
+                          '/ (/ v1 v2)))
+    :else "no matching clause"))
 
 (defn interp
   [exp]

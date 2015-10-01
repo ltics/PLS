@@ -13,5 +13,4 @@
     (is= (interp '((lambda (x) (* 2 x)) 3)) 6)
     (is= (interp '(((lambda (x) (lambda (y) (* x y))) 2) 3)) 6)
     (is= (interp '((lambda (y) (((lambda (y) (lambda (x) (* y 2))) 3) 0)) 4)) 6)
-    ;;(interp '(1 2))
-    ))
+    (is= (interp '(1 2)) "no matching clause")))
