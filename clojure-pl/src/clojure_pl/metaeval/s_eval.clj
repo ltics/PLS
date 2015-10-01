@@ -1,4 +1,4 @@
-(ns clojure-pl.s-eval
+(ns clojure-pl.metaeval.s-eval
   (:require [clojure-pl.cota :refer :all]))
 
 (defn s-eval
@@ -74,8 +74,3 @@
                                            (m-eval env v)]) exp))
       (coll? exp) (into (empty exp) (map #(m-eval env %) exp))
       :else exp)))
-
-(m-eval {'x 1 'y 2} '(* x (+ (let [z 5] z) 3)))
-(m-eval {'x 1 'y 2} '(+ (let [z 5] z) 3))
-(m-eval {} '{:a 1 :b 2})
-
