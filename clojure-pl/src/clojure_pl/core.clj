@@ -7,4 +7,5 @@
   (if args
     (condp = (first args)
       "forth" (do (println "mini forth lang =>")
-                  (forth/repl (init-struct))))))
+                  (forth/repl (init-struct)))
+      "lsystem" nil)))
