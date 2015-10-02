@@ -17,7 +17,9 @@ lein run forth
 * [l-system](https://en.wikipedia.org/wiki/L-system)
 
 ```
-lein run lsystem
+lein run lsystem dragon
+lein run lsystem pentigree
+lein run lsystem triangle
 ```
 
 * check UT
