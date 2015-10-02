@@ -3,7 +3,7 @@
   (:import (java.util Scanner))
   (:refer-clojure :exclude [pop!]))
 
-(declare forth-eval*)
+(declare forth-eval)
 
 (defn pop!
   [stack]
@@ -51,10 +51,10 @@
                                      b
                                      (recur (conj b n) (next-token stream))))]
                       (extend-env name (fn [] (doseq [token block]
-                                                (forth-eval* env stack token))))))
+                                                (forth-eval env stack token))))))
     [env stack stream]))
 
-(defn forth-eval*
+(defn forth-eval
   [env stack token]
   (cond
     (contains? @env token) ((@env token))
@@ -66,5 +66,5 @@
   (let [[env stack stream] struct
         token (next-token stream)]
     (when-not (= token "quit")
-      (forth-eval* env stack token)
+      (forth-eval env stack token)
       (repl struct))))
