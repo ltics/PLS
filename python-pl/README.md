@@ -6,3 +6,9 @@
 python bf.py $filepath
 pypy bf.py $filepath #pypy is much faster than cpython and clojure, the power of JIT
 ```
+
+* hm
+
+```
+python hm.py
+```
