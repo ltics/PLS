@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 def mainloop(program, bracket_map):
     pc = 0
     tape = Tape()

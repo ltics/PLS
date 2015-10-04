@@ -75,18 +75,11 @@
           (when (bf-instructions ch)
             (push! parsed ch)
             (condp = ch
-              \[ (do
-                   (prn "left bracket")
-                   (prn @pc)
-                   (push! leftstack @pc)
-                   (prn @leftstack))
-              \] (do
-                   (prn "right bracket")
-                   (prn @pc)
-                   (let [left (pop! leftstack)
-                         right @pc]
-                     (swap! bracket-map assoc left right)
-                     (swap! bracket-map assoc right left)))
+              \[ (push! leftstack @pc)
+              \] (let [left (pop! leftstack)
+                       right @pc]
+                   (swap! bracket-map assoc left right)
+                   (swap! bracket-map assoc right left))
               "no match character")
             (swap! pc inc))
           (recur (inc instruct-pointer)))))))
