@@ -3,7 +3,7 @@
 * [brainfuck](https://en.wikipedia.org/wiki/Brainfuck)
 
 ```
-lein run bf
+lein run bf $filepath
 ```
 
 * [forth lang](https://en.wikipedia.org/wiki/Forth_(programming_language))
