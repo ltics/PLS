@@ -5,6 +5,7 @@
 ;;current-cell-pointer 类似指向图灵机当前可访问内存的指针
 
 (defn bf-interpreter
+  "this is a slow brainfuck interpreter"
   [codes]
   ;;should find matched bracket from left -> right and right -> left
   (let [match-bracket (fn [open-bracket close-bracket instruction-pointer direction]
@@ -23,6 +24,29 @@
         \< (recur cells (dec current-cell-pointer) (inc instruct-pointer))
         \> (let [next-ptr (inc current-cell-pointer)
                  next-cells (if (= next-ptr (count cells))
-                             (conj cells 0N)
-                             cells)]
-             (recur next-cells next-ptr (inc instruct-pointer)))))))
+                              (conj cells 0N)
+                              cells)]
+             (recur next-cells next-ptr (inc instruct-pointer)))
+        \+ (recur (update-in cells [current-cell-pointer] inc)
+                  current-cell-pointer
+                  (inc instruct-pointer))
+        \- (recur (update-in cells [current-cell-pointer] dec)
+                  current-cell-pointer
+                  (inc instruct-pointer))
+        \. (do
+             (print (char (nth cells current-cell-pointer)))
+             (recur cells current-cell-pointer (inc instruct-pointer)))
+        \, (let [ch (.read System/in)]
+             (recur (assoc cells current-cell-pointer ch)
+                    current-cell-pointer
+                    (inc instruct-pointer)))
+        \[ (recur cells current-cell-pointer (inc (if (zero? (nth cells current-cell-pointer))
+                                                    (match-bracket \[ \] instruct-pointer inc)
+                                                    instruct-pointer)))
+        \] (recur cells current-cell-pointer (match-bracket \] \[ instruct-pointer dec))
+        nil cells
+        (recur cells current-cell-pointer (inc instruct-pointer))))))
+
+(defn run
+  [filepath]
+  (bf-interpreter (slurp filepath)))
