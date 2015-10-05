@@ -1,5 +1,5 @@
 (ns clojure-pl.cota-test
-  (:require [clojure.test :refer :all]
+  (:require [acolfut.sweet :refer :all]
             [clojure-pl.cota :refer :all]))
 
 (deftest cota-test

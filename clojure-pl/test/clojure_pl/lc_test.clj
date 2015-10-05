@@ -1,5 +1,5 @@
 (ns clojure-pl.lc-test
-  (:require [clojure.test :refer :all]
+  (:require [acolfut.sweet :refer :all]
             [clojure-pl.cota :refer :all]
             [clojure-pl.lc.utlc :refer :all]))
 

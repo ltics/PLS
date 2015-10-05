@@ -1,5 +1,5 @@
 (ns clojure-pl.meta-eval-test
-  (:require [clojure.test :refer :all]
+  (:require [acolfut.sweet :refer :all]
             [clojure-pl.cota :refer :all]
             [clojure-pl.metaeval.s-eval :refer :all]))
 
