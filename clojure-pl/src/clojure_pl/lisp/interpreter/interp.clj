@@ -1,6 +1,5 @@
 (ns clojure-pl.lisp.interpreter.interp
-  (:require [clojure-pl.cota :refer :all]
-            [clojure-pl.lisp.interpreter.buildin :refer :all]))
+  (:require [clojure-pl.cota :refer :all]))
 
 (declare eval*)
 (declare apply*)
