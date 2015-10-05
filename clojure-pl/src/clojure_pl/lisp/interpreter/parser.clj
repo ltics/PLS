@@ -1,4 +1,5 @@
 (ns clojure-pl.lisp.interpreter.parser
+  (:require [clojure-pl.cota :refer :all])
   (import (java.lang.Character)))
 
 ;;keypoints to understand tokenizer
@@ -82,4 +83,4 @@
 
 (defn parse
   [codes]
-  (first (parse* codes)))
+  (car (parse* codes)))

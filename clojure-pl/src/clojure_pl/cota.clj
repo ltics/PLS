@@ -27,3 +27,15 @@
         (if (= k lhs)
           (second x)
           (recur (rest xs)))))))
+
+;;debug log
+
+(def ^{:dynamic true
+       :doc "Enable debug tracing"}
+*debug* (atom true))
+
+(defmacro dprn
+  "Print string if in debug mode"
+  [& body]
+  `(when @*debug*
+     (println ~@body)))
