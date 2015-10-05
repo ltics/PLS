@@ -28,25 +28,26 @@
                      (Character/isWhitespace fst) [acc rst]
                      :else (recur (str acc fst) rst))))
           (tokenize* [acc [fst snd & rst]]
-                       (let [rst (apply str rst)
-                             rst2 (str snd rst)]
-                         (cond
-                           ;;if codes is [] or "" fst will be nil after deconstruct
-                           (nil? fst) acc
-                           ;;ignore whitespace
-                           (Character/isWhitespace fst) (recur acc rst2)
-                           (= fst \() (recur (conj acc [:open]) rst2)
-                           (= fst \)) (recur (conj acc [:close]) rst2)
-                           (= fst \") (let [[s t] (string "" rst2)]
-                                        (recur (conj acc [:string s]) t))
-                           (and (= fst \-) (Character/isDigit snd))
-                           (let [[n t] (token (str \- snd) rst)]
-                             (recur (conj acc [:number n]) t))
-                           (and (= fst \+) (Character/isDigit snd))
-                           (let [[n t] (token (str \+ snd) rst)]
-                             (recur (conj acc [:number n]) t))
-                           :else (let [[s t] (token fst rst2)]
-                                   (recur (conj acc [:symbol s]) t)))))]
+                     (let [rst (apply str rst)
+                           rst2 (str snd rst)]
+                       (cond
+                         ;;if codes is [] or "" fst will be nil after deconstruct
+                         (nil? fst) acc
+                         ;;ignore whitespace
+                         (Character/isWhitespace fst) (recur acc rst2)
+                         (= fst \() (recur (conj acc [:open]) rst2)
+                         (= fst \)) (recur (conj acc [:close]) rst2)
+                         (= fst \") (let [[s t] (string "" rst2)]
+                                      (recur (conj acc [:string s]) t))
+                         ;;extract number
+                         (and (or (= fst \-)
+                                  (= fst \+))
+                              (Character/isDigit snd))
+                         (let [[n t] (token (str fst snd) rst)]
+                           (recur (conj acc [:number n]) t))
+
+                         :else (let [[s t] (token fst rst2)]
+                                 (recur (conj acc [:symbol s]) t)))))]
     (tokenize* [] codes)))
 
 ;;keypoints to understand parse*
