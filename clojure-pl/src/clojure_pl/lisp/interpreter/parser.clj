@@ -48,3 +48,37 @@
                            :else (let [[s t] (token fst rst2)]
                                    (recur (conj acc [:symbol s]) t)))))]
     (tokenize* [] codes)))
+
+;;keypoints to understand parse*
+;;(let [[fst & rst] []] body) fst -> nil rst -> nil
+;;(let [[a b] nil] body) a -> nil b -> nil
+
+(defn parse*
+  {:private true}
+  [codes]
+  (letfn [(map-token [[token value]]
+                     (condp = token
+                       ;;数字统一处理成双精度浮点型
+                       :number (Double/parseDouble value)
+                       :string value
+                       :symbol (try
+                                 (Double/parseDouble (str value))
+                                 (catch Exception _ (keyword (str value))))
+                       (throw (Exception. "syntax error"))))
+          (parse** [acc tokens]
+                   (let [[fst & rst] tokens
+                         [token _] fst]
+                     (cond
+                       ;;解析结束之后就将解析结果返回
+                       (nil? token) acc
+                       ;;如果是open bracket那就先解析下一个token
+                       (= token :open) (let [[e t] (parse** [] rst)]
+                                         (recur (conj acc e) t))
+                       ;;如果是close bracket就返回到配对的open bracket处继续解析
+                       (= token :close) [acc rst]
+                       :else (recur (conj acc (map-token fst)) rst))))]
+    (parse** [] (tokenizer codes))))
+
+(defn parse
+  [codes]
+  (first (parse* codes)))

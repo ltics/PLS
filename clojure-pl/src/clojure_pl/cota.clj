@@ -1,5 +1,5 @@
 (ns clojure-pl.cota
-  (:require [clojure.test :refer :all]))
+  (:require [acolfut.sweet :refer :all]))
 
 (def car first)
 (def cdr rest)
