@@ -12,7 +12,7 @@
                          (key fst)
                          (when-not (nil? rst)
                            (recur rst))))]
-    (dprn "lookup key -> " key)
+    (dprn "lookup key ->" key)
     (let [value (lookup-env* env)]
       (if-not (nil? value)
         value
@@ -24,10 +24,11 @@
 
 (defn eval*
   [exp env]
-  (dprn "eval -> " exp)
+  (dprn "eval ->" exp)
   (cond
     (or (number? exp)
         (string? exp)
+        (nil? exp)
         (fn? exp))
     [exp env]
 
@@ -37,7 +38,7 @@
     (vector? exp)
     (let [[fst & rst] exp
           [r e] (eval* fst env)]
-      (dprn "comb " fst rst "(" r e ")")
+      (dprn "comb" fst rst "(" r e ")")
       (cond
         (fn? r) (apply* r rst e)
         (list? r) (let [[args body] r
@@ -51,5 +52,5 @@
 
 (defn apply*
   [f args env]
-  (dprn "apply -> " f args)
+  (dprn "apply ->" f args)
   (f args env))

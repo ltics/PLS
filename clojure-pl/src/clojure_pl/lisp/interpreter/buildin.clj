@@ -7,13 +7,13 @@
   {:private true}
   [f name]
   (fn [args env]
-    (dprn name " -> " args)
+    (dprn name "->" args)
     (let [args (map #(car (eval* % env)) args)]
       [(reduce f args) env])))
 
 (defn- not*
   [[fst & rst] env]
-  (dprn "not " fst " " rst)
+  (dprn "not" fst rst)
   [(not (get-evaled fst env)) env])
 
 (defn- if*
@@ -43,12 +43,24 @@
                           res
                           (recur rst)))
                       [nil env]))]
-    (dprn "cond -> " exps)
+    (dprn "cond ->" exps)
     (run-exps exps)))
+
+(defn- cons*
+  [[fst snd] env]
+  (dprn "cons ->" fst snd)
+  (let [fval (get-evaled fst env)
+        sval (get-evaled snd env)]
+    (if (nil? sval)
+      [(list fval) env]
+      (if ((some-fn seq? vector? list?) sval)
+        [(cons fval sval) env]
+        [(list fval sval) env]))))
 
 (def buildin-env
   [{:not not*
     :if if*
     :cond cond*
+    :cons cons*
     :true true
     :false false}])

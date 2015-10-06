@@ -33,9 +33,17 @@
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(kalle +12 24) (olle -12)") [:kalle 12.0 24.0])
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(not true)") [:not :true]))
   (testing "eval test"
+    ;;not
     (is= (eval* (parse "(not true)") buildin-env) [(not true) buildin-env])
+    ;;if
     (is= (eval* (parse "(if true 1 2)") buildin-env) [1.0 buildin-env])
     (is= (eval* (parse "(if false 1 2)") buildin-env) [2.0 buildin-env])
+    ;;cond
     (is= (eval* (parse "(cond (true 1))") buildin-env) [1.0 buildin-env])
     (is= (eval* (parse "(cond (false 1) (true 2))") buildin-env) [2.0 buildin-env])
-    (is= (eval* (parse "(cond (false 1) (false 2) (else 3))") buildin-env) [3.0 buildin-env])))
+    (is= (eval* (parse "(cond (false 1) (false 2) (else 3))") buildin-env) [3.0 buildin-env])
+    ;;cons
+    (is= (eval* (parse "(cons 1)") buildin-env) ['(1.0) buildin-env])
+    (is= (eval* (parse "(cons 1 2)") buildin-env) ['(1.0 2.0) buildin-env])
+    (is= (eval* (parse "(cons 1 (1 2))") buildin-env) ['(1.0 1.0 2.0) buildin-env])
+    (is= (eval* (parse "(cons 1 (cons 1 2))") buildin-env) ['(1.0 1.0 2.0) buildin-env])))
