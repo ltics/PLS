@@ -111,6 +111,21 @@
   (let [r (get-evaled v env)]
     [(nil-or-empty? r) env]))
 
+(defn- let*
+  [[binds body] env]
+  (letfn [(do-bind [acc [fst & rst]]
+                   (dprn "let-do-bind" acc fst rst)
+                   (if-not (nil? fst)
+                     (let [[name value] fst]
+                       (recur
+                         (assoc acc name (get-evaled value env))
+                         rst))
+                     acc))]
+    (dprn "let" binds body)
+    (let [new-env (cons (do-bind {} binds) env)]
+      (dprn "let-body" body new-env)
+      [(get-evaled body new-env) env])))
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -131,6 +146,7 @@
     :car car*
     :cdr cdr*
     :null? null?
+    :let let*
     :nil ""
     :true true
     :false false}])
