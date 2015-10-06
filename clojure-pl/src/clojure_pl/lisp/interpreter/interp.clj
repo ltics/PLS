@@ -45,7 +45,7 @@
                         n (zipmap args (map #(get-evaled % e) rst))
                         new-env (cons n e)]
                     (eval* body new-env))
-        :else [exp env]))
+        :else [(cons r rst) env]))
 
     :else
     (throw (Exception. (format "invalid interpreter state %s %s" (str exp) (str env))))))

@@ -70,6 +70,18 @@
     (dprn "list" exps)
     [(seq (do-exps [] exps)) env]))
 
+(defn- append*
+  [exps env]
+  (letfn [(do-exps [acc [fst & rst]]
+                   (dprn "append-do-exps" acc fst rst)
+                   (if-not (nil? fst)
+                     (recur
+                       (concat acc (get-evaled fst env))
+                       rst)
+                     acc))]
+    (dprn "append" exps)
+    [(do-exps [] exps) env]))
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -85,5 +97,6 @@
     :cond cond*
     :cons cons*
     :list list*
+    :append append*
     :true true
     :false false}])
