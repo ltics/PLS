@@ -83,4 +83,9 @@
     (is= (eval* (parse "(add 1 2)") (second (eval* (parse "(define (add a b) (+ a b))") buildin-env)))
          [3.0 (cons {:a 1.0 :b 2.0} (assoc-in buildin-env [0 :add] '((:a :b) [:+ :a :b])))])
     (is= (eval* (parse "(+ a 2)") (second (eval* (parse "(define a 1)") buildin-env)))
-         [3.0 (assoc-in buildin-env [0 :a] 1.0)])))
+         [3.0 (assoc-in buildin-env [0 :a] 1.0)])
+    ;;lambda
+    (is= (eval* (parse "((lambda (a) (+ a 1)) 1)") buildin-env)
+         [2.0 (cons {:a 1.0} buildin-env)])
+    (is= (eval* (parse "((lambda (a) (+ a a)) 1)") buildin-env)
+         [2.0 (cons {:a 1.0} buildin-env)])))

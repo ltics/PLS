@@ -150,6 +150,21 @@
     (let [new-env (assoc (first env) name (get-evaled body env))]
       [nil (cons new-env (rest env))])))
 
+(defn- lambda*
+  [[args body] env]
+  (letfn [(do-body [acc args [fst & rst]]
+                   (dprn "lambda-do-body" acc args fst)
+                   (if-not (nil? fst)
+                     (if-not (nil? (args fst))
+                       (recur (conj acc fst) args rst)
+                       (let [fval (get-evaled fst env)]
+                         (if-not (nil? fval)
+                           (recur (conj acc fval) args rst)
+                           (throw (Exception. (format "unbound symbol %s" fst))))))
+                     acc))]
+    (dprn "lambda" args body env)
+    [(list (seq args) (do-body [] (set args) body)) env]))
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -174,6 +189,7 @@
     :display display*
     :newline newline*
     :define define*
+    :lambda lambda*
     :nil ""
     :true true
     :false false}])
