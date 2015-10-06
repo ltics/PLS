@@ -138,6 +138,18 @@
   (println)
   [nil env])
 
+(defn- define*
+  [[name body] env]
+  (dprn "define" name body)
+  (if (vector? name)
+    ;;define a function
+    (let [[func-name & args] name
+          new-env (assoc (first env) func-name (list args body))]
+      [nil (cons new-env (rest env))])
+    ;;define a variable
+    (let [new-env (assoc (first env) name (get-evaled body env))]
+      [nil (cons new-env (rest env))])))
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -161,6 +173,7 @@
     :let let*
     :display display*
     :newline newline*
+    :define define*
     :nil ""
     :true true
     :false false}])

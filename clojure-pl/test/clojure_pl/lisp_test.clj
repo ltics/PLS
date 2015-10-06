@@ -78,4 +78,9 @@
     (is= (eval* (parse "(let ((a 1) (b 2)) (+ a b))") buildin-env) [3.0 buildin-env])
     ;;display newline
     (is= (eval* (parse "(display (+ 1 2))") buildin-env) [nil buildin-env])
-    (is= (eval* (parse "(newline)") buildin-env) [nil buildin-env])))
+    (is= (eval* (parse "(newline)") buildin-env) [nil buildin-env])
+    ;;define
+    (is= (eval* (parse "(add 1 2)") (second (eval* (parse "(define (add a b) (+ a b))") buildin-env)))
+         [3.0 (cons {:a 1.0 :b 2.0} (assoc-in buildin-env [0 :add] '((:a :b) [:+ :a :b])))])
+    (is= (eval* (parse "(+ a 2)") (second (eval* (parse "(define a 1)") buildin-env)))
+         [3.0 (assoc-in buildin-env [0 :a] 1.0)])))

@@ -41,7 +41,9 @@
       (dprn "comb" fst rst "(" r e ")")
       (cond
         (fn? r) (apply* r rst e)
+        ;;when call a defined function will trigger this out
         (list? r) (let [[args body] r
+                        ;;n is a local bind env
                         n (zipmap args (map #(get-evaled % e) rst))
                         new-env (cons n e)]
                     (eval* body new-env))
