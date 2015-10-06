@@ -5,6 +5,8 @@
             [clojure-pl.lisp.interpreter.buildin :refer :all]
             [clojure-pl.lisp.interpreter.interp :refer :all]))
 
+(reset! *debug* false)
+
 (deftest interpreter-test
   (testing "tokenizer test"
     (is= (#'clojure-pl.lisp.interpreter.parser/tokenizer "(cleantha)")
@@ -31,4 +33,6 @@
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(kalle +12 24) (olle -12)") [:kalle 12.0 24.0])
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(not true)") [:not :true]))
   (testing "eval test"
-    (is= (eval* (parse "(not true)") buildin-env) [(not true) buildin-env])))
+    (is= (eval* (parse "(not true)") buildin-env) [(not true) buildin-env])
+    (is= (eval* (parse "(if true 1 2)") buildin-env) [1.0 buildin-env])
+    (is= (eval* (parse "(if false 1 2)") buildin-env) [2.0 buildin-env])))
