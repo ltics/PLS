@@ -7,6 +7,7 @@
 ;;(let [[fst & rst] "a"] (prn fst) xxx) fst -> \a rst -> nil
 ;;(apply str nil) => ""
 ;;(str nil "") => ""
+;;(str nil nil) => ""
 
 (defn tokenizer
   {:private true}
@@ -15,9 +16,10 @@
                   (let [rst (apply str rst)]
                     (cond
                       ;;the close bracket of a string
+                      (and (= fst \\) (= snd \")) (recur (str acc "\"") rst)
                       (= fst \") [acc (str snd rst)]
                       (not (nil? fst)) (recur (str acc fst) (str snd rst))
-                      :else (throw (Exception. (str "can not tokenize ->" codes))))))
+                      :else (throw (Exception. (str "can not tokenize -> " codes))))))
           (token [acc [fst & rst :as s]]
                  (let [rst (apply str rst)]
                    (cond

@@ -29,6 +29,7 @@
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(+ 1 a)") [:+ 1.0 :a])
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "+12") 12.0)
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"cleantha\"") "cleantha")
+    (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"clean\\\"tha\"") "clean\"tha")
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "kalle olle") :kalle)
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(kalle +12 24) (olle -12)") [:kalle 12.0 24.0])
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(not true)") [:not :true]))
