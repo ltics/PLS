@@ -59,4 +59,13 @@
     (is= (eval* (parse "(append ((+ 1 2) 2) (3 4))") buildin-env) ['(3.0 2.0 3.0 4.0) buildin-env])
     ;;begin
     (is= (eval* (parse "(begin (+ 1 2))") buildin-env) [3.0 buildin-env])
-    (is= (eval* (parse "(begin (+ 1 2) (+ 3 4))") buildin-env) [7.0 buildin-env])))
+    (is= (eval* (parse "(begin (+ 1 2) (+ 3 4))") buildin-env) [7.0 buildin-env])
+    ;;car
+    (is= (eval* (parse "(car ())") buildin-env) [nil buildin-env])
+    (is= (eval* (parse "(car (1))") buildin-env) [1.0 buildin-env])
+    (is= (eval* (parse "(car (1 2 3))") buildin-env) [1.0 buildin-env])
+    ;;cdr
+    (is= (eval* (parse "(cdr ())") buildin-env) ['() buildin-env])
+    (is= (eval* (parse "(cdr (1))") buildin-env) ['() buildin-env])
+    (is= (eval* (parse "(cdr (1 2))") buildin-env) ['(2.0) buildin-env])
+    (is= (eval* (parse "(cdr (1 2 3))") buildin-env) ['(2.0 3.0) buildin-env])))

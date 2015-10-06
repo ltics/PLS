@@ -93,6 +93,18 @@
     (dprn "begin" exps)
     (do-exps exps env nil)))
 
+;;key to understand
+;;(let [[fst] [1 2 3]] fst) => 1
+(defn- car*
+  [[lst] env]
+  (dprn "car" lst)
+  [(car (get-evaled lst env)) env])
+
+(defn- cdr*
+  [[lst] env]
+  (dprn "cdr" lst)
+  [(cdr (get-evaled lst env)) env])
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -110,5 +122,7 @@
     :list list*
     :append append*
     :begin begin*
+    :car car*
+    :cdr cdr*
     :true true
     :false false}])
