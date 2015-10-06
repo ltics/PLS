@@ -68,4 +68,9 @@
     (is= (eval* (parse "(cdr ())") buildin-env) ['() buildin-env])
     (is= (eval* (parse "(cdr (1))") buildin-env) ['() buildin-env])
     (is= (eval* (parse "(cdr (1 2))") buildin-env) ['(2.0) buildin-env])
-    (is= (eval* (parse "(cdr (1 2 3))") buildin-env) ['(2.0 3.0) buildin-env])))
+    (is= (eval* (parse "(cdr (1 2 3))") buildin-env) ['(2.0 3.0) buildin-env])
+    ;;null?
+    (is= (eval* (parse "(null? nil)") buildin-env) [true buildin-env])
+    (is= (eval* (parse "(null? 1)") buildin-env) [false buildin-env])
+    (is= (eval* (parse "(null? (if true 1))") buildin-env) [false buildin-env])
+    (is= (eval* (parse "(null? (if false 1))") buildin-env) [true buildin-env])))

@@ -28,6 +28,18 @@
           (second x)
           (recur (rest xs)))))))
 
+(defn safe-empty?
+  "data like int, keyword, double are considered not empty"
+  [x]
+  (try
+    (empty? x)
+    (catch IllegalArgumentException _
+      false)))
+
+(defn nil-or-empty?
+  [v]
+  ((some-fn nil? safe-empty?) v))
+
 ;;debug log
 
 (def ^{:dynamic true

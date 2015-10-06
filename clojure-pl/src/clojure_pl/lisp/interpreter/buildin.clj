@@ -105,6 +105,12 @@
   (dprn "cdr" lst)
   [(cdr (get-evaled lst env)) env])
 
+(defn- null?
+  [[v] env]
+  (dprn "null?" v)
+  (let [r (get-evaled v env)]
+    [(nil-or-empty? r) env]))
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -124,5 +130,7 @@
     :begin begin*
     :car car*
     :cdr cdr*
+    :null? null?
+    :nil ""
     :true true
     :false false}])
