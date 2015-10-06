@@ -126,6 +126,18 @@
       (dprn "let-body" body new-env)
       [(get-evaled body new-env) env])))
 
+(defn- display*
+  [[lst] env]
+  (dprn "display" lst)
+  (println (get-evaled lst env))
+  [nil env])
+
+(defn- newline*
+  [[lst] env]
+  (dprn "newline" lst)
+  (println)
+  [nil env])
+
 (def buildin-env
   [{:+ (gen-uncertain-param-fn + "add")
     :- (gen-uncertain-param-fn - "sub")
@@ -147,6 +159,8 @@
     :cdr cdr*
     :null? null?
     :let let*
+    :display display*
+    :newline newline*
     :nil ""
     :true true
     :false false}])

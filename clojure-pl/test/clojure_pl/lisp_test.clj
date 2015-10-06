@@ -75,4 +75,7 @@
     (is= (eval* (parse "(null? (if true 1))") buildin-env) [false buildin-env])
     (is= (eval* (parse "(null? (if false 1))") buildin-env) [true buildin-env])
     ;;let
-    (is= (eval* (parse "(let ((a 1) (b 2)) (+ a b))") buildin-env) [3.0 buildin-env])))
+    (is= (eval* (parse "(let ((a 1) (b 2)) (+ a b))") buildin-env) [3.0 buildin-env])
+    ;;display newline
+    (is= (eval* (parse "(display (+ 1 2))") buildin-env) [nil buildin-env])
+    (is= (eval* (parse "(newline)") buildin-env) [nil buildin-env])))
