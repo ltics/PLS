@@ -1,6 +1,7 @@
 (ns clojure-pl.lisp.interpreter.buildin
   (:require [clojure-pl.cota :refer :all]
-            [clojure-pl.lisp.interpreter.interp :refer :all]))
+            [clojure-pl.lisp.interpreter.interp :refer :all])
+  (:refer-clojure :exclude [list*]))
 
 ;;生成不定参数函数
 (defn gen-uncertain-param-fn
@@ -57,10 +58,32 @@
         [(cons fval sval) env]
         [(list fval sval) env]))))
 
+(defn- list*
+  [exps env]
+  (letfn [(do-exps [acc [fst & rst]]
+                   (dprn "list-do-exps" acc fst rst)
+                   (if-not (nil? fst)
+                     (recur
+                       (conj acc (get-evaled fst env))
+                       rst)
+                     acc))]
+    (dprn "list" exps)
+    [(seq (do-exps [] exps)) env]))
+
 (def buildin-env
-  [{:not not*
+  [{:+ (gen-uncertain-param-fn + "add")
+    :- (gen-uncertain-param-fn - "sub")
+    :* (gen-uncertain-param-fn * "mul")
+    :/ (gen-uncertain-param-fn / "div")
+    := (gen-uncertain-param-fn = "eq")
+    :> (gen-uncertain-param-fn > "gt")
+    :>= (gen-uncertain-param-fn >= "gte")
+    :< (gen-uncertain-param-fn < "lt")
+    :<= (gen-uncertain-param-fn <= "lte")
+    :not not*
     :if if*
     :cond cond*
     :cons cons*
+    :list list*
     :true true
     :false false}])
