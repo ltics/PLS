@@ -25,8 +25,30 @@
         (eval* alternative env)
         [nil env]))))
 
+(defn- cond*
+  [exps env]
+  (letfn [(do-exp [[predicate consequent]]
+                  (dprn "cond-do-exp" predicate consequent)
+                  (if (= predicate :else)
+                    [true, (eval* consequent env)]
+                    (let [[predicate _] (eval* predicate env)]
+                      (if predicate
+                        [true (eval* consequent env)]
+                        [false nil]))))
+          (run-exps [[fst & rst]]
+                    (dprn "cond-run-exps" fst rst)
+                    (if-not (nil? fst)
+                      (let [[status res] (do-exp fst)]
+                        (if status
+                          res
+                          (recur rst)))
+                      [nil env]))]
+    (dprn "cond -> " exps)
+    (run-exps exps)))
+
 (def buildin-env
   [{:not not*
     :if if*
+    :cond cond*
     :true true
     :false false}])

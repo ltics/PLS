@@ -35,4 +35,7 @@
   (testing "eval test"
     (is= (eval* (parse "(not true)") buildin-env) [(not true) buildin-env])
     (is= (eval* (parse "(if true 1 2)") buildin-env) [1.0 buildin-env])
-    (is= (eval* (parse "(if false 1 2)") buildin-env) [2.0 buildin-env])))
+    (is= (eval* (parse "(if false 1 2)") buildin-env) [2.0 buildin-env])
+    (is= (eval* (parse "(cond (true 1))") buildin-env) [1.0 buildin-env])
+    (is= (eval* (parse "(cond (false 1) (true 2))") buildin-env) [2.0 buildin-env])
+    (is= (eval* (parse "(cond (false 1) (false 2) (else 3))") buildin-env) [3.0 buildin-env])))
