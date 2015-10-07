@@ -14,6 +14,10 @@
          ~conseq#
          (cond ~@rst#)))))
 
+#_(clojure.walk/macroexpand-all
+  '(cond ((< x 0) (- 0 x)) ((= x 0) 100) (else x)))
+;;(if (< x 0) (- 0 x) (if (= x 0) 100 (if :else x nil)))
+
 (defmacro define
   [name-with-args body]
   (if (coll? name-with-args)
