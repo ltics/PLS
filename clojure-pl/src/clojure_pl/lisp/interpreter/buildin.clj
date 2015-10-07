@@ -10,7 +10,7 @@
   (fn [args env]
     (dprn name "->" args)
     (let [args (map #(car (eval* % env)) args)]
-      [(reduce f args) env])))
+      [(apply f args) env])))
 
 (defn- not*
   [[fst & rst] env]
@@ -68,7 +68,9 @@
                        rst)
                      acc))]
     (dprn "list" exps)
-    [(seq (do-exps [] exps)) env]))
+    [(->> (do-exps [] exps)
+          (into '())
+          reverse) env]))
 
 (defn- append*
   [exps env]
