@@ -1,4 +1,4 @@
-(ns clojure-pl.lisp-test
+(ns clojure-pl.lisp.interpreter-test
   (:require [acolfut.sweet :refer :all]
             [clojure-pl.cota :refer :all]
             [clojure-pl.lisp.interpreter.parser :refer :all]

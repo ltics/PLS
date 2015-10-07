@@ -13,6 +13,12 @@
 (defmacro is= [& body]
   `(is (= ~@body)))
 
+(defmacro isnot= [& body]
+  `(is (not (= ~@body))))
+
+(defmacro isnot [& body]
+  `(is (not ~@body)))
+
 (def boolean? #(or (true? %) (false? %)))
 
 (defn assq
