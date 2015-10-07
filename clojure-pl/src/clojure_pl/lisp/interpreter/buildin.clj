@@ -144,7 +144,7 @@
   [[name body] env]
   (dprn "define" name body)
   (if (vector? name)
-    ;;define a function
+    ;;define a function even it is recursive
     (let [[func-name & args] name
           new-env (assoc (first env) func-name (list args body))]
       [nil (cons new-env (rest env))])
