@@ -5,6 +5,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [acolfut "0.3.0"]]
   :plugins [[lein-colortest "0.3.0"]]
+  :aliases {"metainterp" ["run" "-m" "clojure-pl.lisp.metainterp.repl"]}
   :main ^:skip-aot clojure-pl.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
