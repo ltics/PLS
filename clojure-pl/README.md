@@ -22,6 +22,18 @@ lein run lsystem pentigree
 lein run lsystem triangle
 ```
 
+* [lisp interpreter]
+
+```
+lein run lisp
+```
+
+* [meta interpreter]
+
+```
+lein metainterp
+```
+
 * check UT
 
 ```
