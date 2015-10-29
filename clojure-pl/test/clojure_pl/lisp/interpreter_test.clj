@@ -30,6 +30,9 @@
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "+12") 12.0)
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"cleantha\"") "cleantha")
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"clean\\\"tha\"") "clean\"tha")
+    (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"123\"") "123")
+    ;;parser.clj 第19行代码的作用
+    (is= (#'clojure-pl.lisp.interpreter.parser/parse "\"\\\"123\\\"\"") "\"123\"")
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "kalle olle") :kalle)
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(kalle +12 24) (olle -12)") [:kalle 12.0 24.0])
     (is= (#'clojure-pl.lisp.interpreter.parser/parse "(not true)") [:not :true]))
@@ -92,14 +95,14 @@
            [2.0 (cons {:a 1.0} buildin-env)])))
   (testing "lisp interpreter"
     (letfn [(test-eq-with-env [s r e]
-                  (is (= (get-evaled (parse s) e) r)))
+                              (is (= (get-evaled (parse s) e) r)))
             (test-eq [s r]
-                  (test-eq-with-env s r buildin-env))
+                     (test-eq-with-env s r buildin-env))
             (get-env-env [s e]
-                  (let [[_ env] (eval* (parse s) e)]
-                    env))
+                         (let [[_ env] (eval* (parse s) e)]
+                           env))
             (get-env [s]
-                  (get-env-env s buildin-env))]
+                     (get-env-env s buildin-env))]
       (testing "number"
         (test-eq "3.14" 3.14))
       (testing "string"
