@@ -4,7 +4,7 @@ a="$1"
 if [ $a == "jar" ];then
     mvn clean
     mvn assembly:assembly
-    java -jar target/hm-scala-1.0-jar-with-dependencies.jar
+    java -jar target/scala-pl-1.0-jar-with-dependencies.jar
 elif [ $a == "scala" ];then
     mvn clean
     mvn scala:run -Dlauncher=hm #or mvn scala:run
