@@ -15,8 +15,8 @@
   (letfn [(string [acc [fst snd & rst]]
                   (let [rst (apply str rst)]
                     (cond
-                      ;;the close bracket of a string
                       (and (= fst \\) (= snd \")) (recur (str acc "\"") rst)
+                      ;;the close bracket of a string 开头的那个\"已经在tokenize*函数中被消费掉了 这里判断字符串的闭合\"
                       (= fst \") [acc (str snd rst)]
                       (not (nil? fst)) (recur (str acc fst) (str snd rst))
                       :else (throw (Exception. (str "can not tokenize -> " codes))))))
