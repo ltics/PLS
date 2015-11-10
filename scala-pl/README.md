@@ -1,7 +1,11 @@
 ## run
 
 ```
-./run.sh jar
-./run.sh scala
-./run.sh
+sbt "run-main hm.Core"
+```
+
+## test
+
+```
+sbt test
 ```
