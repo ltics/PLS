@@ -2,17 +2,15 @@
  * Created by zjh on 15/11/10.
  */
 
-import scala.collection.immutable._
-
 package object lisp {
-    type EnvMapT = HashMap[String, ExprT]
+    type EnvMapT = Map[String, ExprT]
     type EnvT = List[EnvMapT]
 
-    def EnvT() = List(new EnvMapT())
+    def EnvT() = List(EnvMapT())
 
     def EnvT(xs: EnvMapT*) = List(xs: _*)
 
-    def EnvMapT(xs: (String, ExprT)*) = HashMap(xs: _*)
+    def EnvMapT(xs: (String, ExprT)*) = Map(xs: _*)
 
     case class Env(val env: EnvT) {
         def addScope(scope: (String, ExprT)): Env = env match {
@@ -20,7 +18,7 @@ package object lisp {
             case List() => throw new IllegalArgumentException
         }
 
-        def expand(): Env = Env(new EnvMapT() :: env)
+        def expand(): Env = Env(EnvMapT() :: env)
 
         def lookup(s: String): Option[ExprT] = {
             env find (_ contains s) map (_(s))
