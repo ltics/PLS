@@ -1,3 +1,5 @@
+package lisp
+
 import org.scalatest._
 
 /**
