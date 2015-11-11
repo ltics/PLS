@@ -14,4 +14,8 @@ class EnvTest extends FlatSpec with Matchers {
         val resEnv = Env(EnvT(EnvMapT(scope)))
         resEnv should be (Env().addScope(scope))
     }
+
+    it should "simple lookup" in {
+        testEnv lookup "key" should be (Some(Value(Num(3))))
+    }
 }

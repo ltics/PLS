@@ -21,6 +21,8 @@ package object lisp {
         def expand(): Env = Env(EnvMapT() :: env)
 
         def lookup(s: String): Option[ExprT] = {
+            println(env find (_ contains s))
+            //下面这个map是Option的map 也就是Maybe这个functor上的fmap
             env find (_ contains s) map (_(s))
         }
 
