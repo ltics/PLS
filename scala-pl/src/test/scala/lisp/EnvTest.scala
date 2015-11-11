@@ -18,4 +18,18 @@ class EnvTest extends FlatSpec with Matchers {
     it should "simple lookup" in {
         testEnv lookup "key" should be (Some(Value(Num(3))))
     }
+
+    it should "nested lookup" in {
+        val newEnv = testEnv.expand()
+        newEnv lookup "key" should be (Some(Value(Num(3))))
+    }
+
+    it should "shadowed nested lookup" in {
+        val newEnv = testEnv.expand().addScope("key" -> Value(Num(33)))
+        newEnv.lookup("key") should be (Some(Value(Num(33))))
+    }
+
+    it should "failing lookup" in {
+        testEnv.lookup("newkey") should be (None)
+    }
 }

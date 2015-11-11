@@ -13,6 +13,8 @@ package object lisp {
     def EnvMapT(xs: (String, ExprT)*) = Map(xs: _*)
 
     case class Env(val env: EnvT) {
+        //+用来append Map
+        //::用来cons List
         def addScope(scope: (String, ExprT)): Env = env match {
             case h :: t => Env((h + scope) :: t)
             case List() => throw new IllegalArgumentException
@@ -21,7 +23,7 @@ package object lisp {
         def expand(): Env = Env(EnvMapT() :: env)
 
         def lookup(s: String): Option[ExprT] = {
-            println(env find (_ contains s))
+            //find是从一个collection里找另一个collection 返回的是一个Option
             //下面这个map是Option的map 也就是Maybe这个functor上的fmap
             env find (_ contains s) map (_(s))
         }
