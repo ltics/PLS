@@ -15,16 +15,20 @@ object TypeSystem {
     }
     case class Oper(name: String, args: Seq[Type]) extends Type
     def Function(from: Type, to: Type) = Oper("→", Array(from, to))
+
     val Integer = Oper("int", Seq())
     val Bool = Oper("bool", Seq())
 
     var _nextVariableName = 'α';
+
     def nextUniqueName = {
         val result = _nextVariableName
         _nextVariableName = (_nextVariableName.toInt + 1).toChar
         result.toString
     }
+
     var _nextVariableId = 0
+
     def newVariable: Variable = {
         val result = _nextVariableId
         _nextVariableId += 1
@@ -32,39 +36,39 @@ object TypeSystem {
     }
 
     def string(t: Type): String = t match {
-        case v: Variable => v.instance match {
+        case v: Variable      => v.instance match {
             case Some(i) => string(i)
-            case None => v.name
+            case None    => v.name
         }
         case Oper(name, args) => {
             if (args.length == 0)
                 name
             else if (args.length == 2)
-                "("+string(args(0))+" "+name+" "+string(args(1))+")"
+                "(" + string(args(0)) + " " + name + " " + string(args(1)) + ")"
             else
                 args.mkString(name + " ", " ", "")
         }
     }
 
-
     def analyse(ast: SyntaxNode, env: Env): Type = analyse(ast, env, Set.empty)
+
     def analyse(ast: SyntaxNode, env: Env, nongen: Set[Variable]): Type = ast match {
-        case Ident(name) => gettype(name, env, nongen)
-        case Apply(fn, arg) => {
+        case Ident(name)           => gettype(name, env, nongen)
+        case Apply(fn, arg)        => {
             val funtype = analyse(fn, env, nongen)
             val argtype = analyse(arg, env, nongen)
             val resulttype = newVariable
             unify(Function(argtype, resulttype), funtype)
             resulttype
         }
-        case Lambda(arg, body) => {
+        case Lambda(arg, body)     => {
             val argtype = newVariable
             val resulttype = analyse(body,
                 env + (arg -> argtype),
                 nongen + argtype)
             Function(argtype, resulttype)
         }
-        case Let(v, defn, body) => {
+        case Let(v, defn, body)    => {
             val defntype = analyse(defn, env, nongen)
             val newenv = env + (v -> defntype)
             analyse(body, newenv, nongen)
@@ -86,7 +90,7 @@ object TypeSystem {
             Integer
 
         else
-            throw new ParseError("Undefined symbol "+name)
+            throw new ParseError("Undefined symbol " + name)
     }
 
     def fresh(t: Type, nongen: Set[Variable]) = {
@@ -108,28 +112,25 @@ object TypeSystem {
         freshrec(t)
     }
 
-
-
     def unify(t1: Type, t2: Type) {
         val type1 = prune(t1)
         val type2 = prune(t2)
         (type1, type2) match {
-            case (a: Variable, b) => if (a != b) {
+            case (a: Variable, b)       => if (a != b) {
                 if (occursintype(a, b))
                     throw new TypeError("recursive unification")
                 a.instance = Some(b)
             }
             case (a: Oper, b: Variable) => unify(b, a)
-            case (a: Oper, b: Oper) => {
+            case (a: Oper, b: Oper)     => {
                 if (a.name != b.name ||
-                    a.args.length != b.args.length) throw new TypeError("Type mismatch: "+string(a)+"≠"+string(b))
+                    a.args.length != b.args.length) throw new TypeError("Type mismatch: " + string(a) + "≠" + string(b))
 
-                for(i <- 0 until a.args.length)
+                for (i <- 0 until a.args.length)
                     unify(a.args(i), b.args(i))
             }
         }
     }
-
 
     // Returns the currently defining instance of t.
     // As a side effect, collapses the list of type instances.
@@ -139,7 +140,7 @@ object TypeSystem {
             v.instance = Some(inst)
             inst
         }
-        case _ => t
+        case _                                   => t
     }
 
     // Note: must be called with v 'pre-pruned'
@@ -148,9 +149,9 @@ object TypeSystem {
     // Note: must be called with v 'pre-pruned'
     def occursintype(v: Variable, type2: Type): Boolean = {
         prune(type2) match {
-            case `v` => true
+            case `v`              => true
             case Oper(name, args) => occursin(v, args)
-            case _ => false
+            case _                => false
         }
     }
 
@@ -158,6 +159,7 @@ object TypeSystem {
         list exists (t2 => occursintype(t, t2))
 
     val checkDigits = "^(\\d+)$".r
+
     def isIntegerLiteral(name: String) = checkDigits.findFirstIn(name).isDefined
 
 }

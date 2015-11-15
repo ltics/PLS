@@ -1,7 +1,7 @@
 package lisp
 
-import org.scalatest._
 import lisp.Parser.parse
+import org.scalatest._
 
 /**
  * Created by zjh on 15/11/11.

@@ -16,14 +16,14 @@ object SyntaxNode {
         if (ast.isInstanceOf[Ident])
             nakedString(ast)
         else
-            "("+nakedString(ast)+")"
+            "(" + nakedString(ast) + ")"
     }
 
     def nakedString(ast: SyntaxNode) = ast match {
-        case i: Ident => i.name
-        case l: Lambda => "fn "+l.v+" ⇒ "+string(l.body)
-        case f: Apply => string(f.fn)+" "+string(f.arg)
-        case l: Let => "let "+l.v+" = "+string(l.defn)+" in "+string(l.body)
-        case l: Letrec => "letrec "+l.v+" = "+string(l.defn)+" in "+string(l.body)
+        case i: Ident  => i.name
+        case l: Lambda => "fn " + l.v + " ⇒ " + string(l.body)
+        case f: Apply  => string(f.fn) + " " + string(f.arg)
+        case l: Let    => "let " + l.v + " = " + string(l.defn) + " in " + string(l.body)
+        case l: Letrec => "letrec " + l.v + " = " + string(l.defn) + " in " + string(l.body)
     }
 }

@@ -16,6 +16,7 @@ object Interp {
                     val newEnv = (args zip t).foldLeft(nEnv.expand())((acc, av) => bindArg(acc, av._1, av._2))
                     evalAll(newEnv, body)
                 }
+                case m @ (_, _)               => m
             }
         }
         case p @ Proc(_)      => (env, p)

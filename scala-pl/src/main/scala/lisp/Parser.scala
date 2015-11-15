@@ -8,14 +8,11 @@ import scala.util.parsing.combinator._
 object Parser extends JavaTokenParsers {
     val value: Parser[ValueT] = {
         //第一个callback里面先tail再init是为了去除两边的\" 比如"\"123\"".tail.init => "123"
-        stringLiteral ^^ (x => Name(x.tail.init)) |
-        floatingPointNumber ^^ (x => Num(BigDecimal(x)))
+        stringLiteral ^^ (x => Name(x.tail.init)) | floatingPointNumber ^^ (x => Num(BigDecimal(x)))
     }
 
     val expression: Parser[ExprT] = {
-        value ^^ (x => Value(x)) |
-        """[^()\s]+""".r ^^ (x => Symbol(x)) |
-        combination
+        value ^^ (x => Value(x)) | """[^()\s]+""".r ^^ (x => Symbol(x)) | combination
     }
 
     val combination: Parser[Comb] = "(" ~> rep(expression) <~ ")" ^^ (x => Comb(x))

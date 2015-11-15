@@ -7,7 +7,9 @@ package object lisp {
     type EnvT = List[EnvMapT]
 
     def EnvT() = List(EnvMapT())
+
     def EnvT(xs: EnvMapT*) = List(xs: _*)
+
     def EnvMapT(xs: (String, ExprT)*) = Map(xs: _*)
 
     case class Env(val env: EnvT) {
@@ -28,7 +30,7 @@ package object lisp {
 
         override def equals(that: Any) = that match {
             case Env(thatEnv) => env == thatEnv
-            case _ => false
+            case _            => false
         }
     }
 

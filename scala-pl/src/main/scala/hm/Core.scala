@@ -6,7 +6,7 @@ package hm
 
 object Core {
 
-    def main(args: Array[String]){
+    def main(args: Array[String]) {
         Console.setOut(new java.io.PrintStream(Console.out, true, "utf-8"))
 
         val var1 = TypeSystem.newVariable
@@ -21,7 +21,7 @@ object Core {
             "cond" -> TypeSystem.Function(TypeSystem.Bool, TypeSystem.Function(var3, TypeSystem.Function(var3, var3))),
             "zero" -> TypeSystem.Function(TypeSystem.Integer, TypeSystem.Bool),
             "pred" -> TypeSystem.Function(TypeSystem.Integer, TypeSystem.Integer),
-            "times"-> TypeSystem.Function(TypeSystem.Integer, TypeSystem.Function(TypeSystem.Integer, TypeSystem.Integer))
+            "times" -> TypeSystem.Function(TypeSystem.Integer, TypeSystem.Function(TypeSystem.Integer, TypeSystem.Integer))
         )
 
 
@@ -29,19 +29,19 @@ object Core {
         val examples = Array[SyntaxNode](
             // factorial
             Letrec("factorial", // letrec factorial =
-                Lambda("n",    // fn n =>
+                Lambda("n", // fn n =>
                     Apply(
-                        Apply(   // cond (zero n) 1
-                            Apply(Ident("cond"),     // cond (zero n)
+                        Apply(// cond (zero n) 1
+                            Apply(Ident("cond"), // cond (zero n)
                                 Apply(Ident("zero"), Ident("n"))),
                             Ident("1")),
-                        Apply(    // times n
+                        Apply(// times n
                             Apply(Ident("times"), Ident("n")),
                             Apply(Ident("factorial"),
                                 Apply(Ident("pred"), Ident("n")))
                         )
                     )
-                ),      // in
+                ), // in
                 Apply(Ident("factorial"), Ident("5"))
             ),
 
@@ -85,7 +85,7 @@ object Core {
             // fn f (fn g (fn arg (f g arg)))
             Lambda("f", Lambda("g", Lambda("arg", Apply(Ident("g"), Apply(Ident("f"), Ident("arg"))))))
         )
-        for(eg <- examples){
+        for (eg <- examples) {
             tryexp(myenv, eg)
         }
     }
@@ -96,9 +96,9 @@ object Core {
             val t = TypeSystem.analyse(ast, env)
             print(TypeSystem.string(t))
 
-        }catch{
+        } catch {
             case t: ParseError => print(t.getMessage)
-            case t: TypeError => print(t.getMessage)
+            case t: TypeError  => print(t.getMessage)
         }
         println
     }
