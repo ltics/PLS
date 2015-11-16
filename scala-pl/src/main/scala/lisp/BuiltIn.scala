@@ -39,5 +39,23 @@ object BuiltIn {
         }
     }
 
+    def buildList(comb: List[ExprT]): List[ValueT] = comb match {
+        case List()         => List()
+        case Symbol(n) :: t => Name(n) :: buildList(t)
+        case Value(v) :: t  => v :: buildList(t)
+        case _              => throw new IllegalArgumentException("define args")
+    }
+
+    def listToString(ls: List[ExprT]) = {
+        def ltos(ls: List[ExprT]): String = ls match {
+            case List()              => ""
+            case Value(Num(v)) :: t  => v.toString + ", " + ltos(t)
+            case Value(Bool(v)) :: t => v.toString + ", " + ltos(t)
+            case Value(Name(v)) :: t => v.toString + ", " + ltos(t)
+            case EList(l) :: t       => "(" + ltos(l) + "), " + ltos(t)
+            case _ :: t              => ltos(t)
+        }
+    }
+
     def globalEnv = Env(EnvT(EnvMapT()))
 }
