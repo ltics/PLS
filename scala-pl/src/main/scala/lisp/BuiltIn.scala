@@ -55,6 +55,56 @@ object BuiltIn {
             case EList(l) :: t       => "(" + ltos(l) + "), " + ltos(t)
             case _ :: t              => ltos(t)
         }
+        "(" + ltos(ls) + ")"
+    }
+
+    def _not_(env: Env, comb: List[ExprT]) = comb match {
+        case expr :: Nil => eval(env, expr) match {
+            case (_, Value(Bool(v))) => (env, Value(Bool(!v)))
+            case _                   => throw new IllegalArgumentException("not")
+        }
+        case _           => throw new IllegalArgumentException("not")
+    }
+
+    def _if_(env: Env, comb: List[ExprT]) = {
+        def error = throw new IllegalArgumentException("if")
+        val (condExpr, posExpr, negExpr) = comb match {
+            case predicate :: consequent :: alternative :: Nil => (predicate, consequent, Some(alternative))
+            case predicate :: consequent :: Nil                => (predicate, consequent, None)
+            case _                                             => error
+        }
+
+        eval(env, condExpr)._2 match {
+            case Value(Bool(c)) =>
+                if (c) {
+                    eval(env, posExpr)
+                } else negExpr match {
+                    case Some(e) => eval(env, e)
+                    case None    => (env, NullExpr())
+                }
+            case _              => error
+        }
+    }
+
+    def _cond_(env: Env, comb: List[ExprT]) = {
+        def error = throw new IllegalArgumentException("cond")
+        def doExpr(comb: List[ExprT]) = comb match {
+            case Symbol("else") :: posExpr :: Nil => Some(eval(env, posExpr)._2)
+            case condExpr :: posExpr :: Nil       => eval(env, condExpr)._2 match {
+                case Value(Bool(true))  => Some(eval(env, posExpr)._2)
+                case Value(Bool(false)) => None
+                case _                  => error
+            }
+            case _                                => error
+        }
+
+        def runExprs(comb: List[ExprT]): ExprT = comb match {
+            case Comb(c) :: rest => doExpr(c) match {
+                case Some(e) => e
+                case None    => runExprs(rest)
+            }
+            case _               => NullExpr()
+        }
     }
 
     def globalEnv = Env(EnvT(EnvMapT()))

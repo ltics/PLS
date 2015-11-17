@@ -15,3 +15,10 @@
 * Proc类型
 
 封装了某一个函数的值
+
+## scala note
+
+* None Nil
+
+Nil就是List(), List(1,2,3)就是1::2::3::Nil
+None就是Maybe Monad里面的Nothing了
