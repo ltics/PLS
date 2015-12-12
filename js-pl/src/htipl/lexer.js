@@ -45,7 +45,7 @@ exports.TokenStream = function(input) {
 		next: next,
 		peek: peek,
 		eof: eof,
-		croak: croak
+		croak: input.croak
 	};
 
 	function is_keyword(x) {
