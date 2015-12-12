@@ -22,3 +22,19 @@
          '{:op    ':app
            :rator AST
            :rand  AST})))
+
+(t/defalias LCSyntax
+  "lc expression syntax"
+  t/Any)
+
+(t/defalias CLJSyntax
+  "clj expression syntax"
+  t/Any)
+
+(defmacro check-input
+  [syntax predicate]
+  `(assert predicate (str "syntax error -> " ~syntax)))
+
+(defn bad-input
+  [syntax]
+  (throw (Exception. (str "syntax error -> " (pr-str syntax)))))

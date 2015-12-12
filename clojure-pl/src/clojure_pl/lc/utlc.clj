@@ -30,7 +30,7 @@
                             v2 (interp* (cadr exp) env)]
                         (let [[param body] (parse-lambda-exp (:f v1))
                               env1 (:env v1)]
-                          ;;if extend env not env1 it will be dynamic scoping
+                          ;;if extend to current env not env1 it will be dynamic scoping
                           (interp* body (ext-env param v2 env1))))
     (= (count exp) 3) (let [op (car exp)
                             v1 (interp* (cadr exp) env)
