@@ -28,8 +28,8 @@
 (defn fibonacci-cps
   [n k]
   (letfn [(cont [n1]
-                (fibonacci-cps (- n 2) (fn [n2]
-                                         (k (+ n1 n2)))))]
+            (fibonacci-cps (- n 2) (fn [n2]
+                                     (k (+ n1 n2)))))]
     (if (<= n 1)
       (k n)
       (recur (- n 1) cont))))

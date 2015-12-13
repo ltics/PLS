@@ -4,6 +4,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/core.typed "0.3.18"]
+                 [org.clojure/core.logic "0.8.10"]
                  [acolfut "0.3.0"]]
   :plugins [[lein-colortest "0.3.0"]
             [lein-typed "0.3.5"]]
