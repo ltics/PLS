@@ -25,4 +25,20 @@
                                    :init {:op  :const
                                           :val 1}
                                    :body {:op   :local
-                                          :name 'a}})))
+                                          :name 'a}})
+    (is= (analyze '(lambda [a] a)) {:op    :lambda
+                                    :param 'a
+                                    :body  {:op   :local
+                                            :name 'a}})
+    (is= (analyze '(let [a (lambda [x] x)] (a 1)))
+         {:op   :let
+          :name 'a
+          :init {:op    :lambda
+                 :param 'x
+                 :body  {:op   :local
+                         :name 'x}}
+          :body {:op    :app
+                 :rator {:op   :local
+                         :name 'a}
+                 :rand  {:op  :const
+                         :val 1}}})))
