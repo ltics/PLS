@@ -1,6 +1,6 @@
-(ns
-  clojure-pl.lc.utlctc
-  (:require [clojure.core.typed :as t]))
+(ns clojure-pl.lc.utlctc
+  (:require [clojure.core.typed :as t]
+            [clojure-pl.cota :refer :all]))
 
 ;;'{:a 1} == {:a 1} ':a == :a
 ;;but wrap a exp in quote can hide compile warning such as can not resolve symbol
@@ -47,6 +47,8 @@
   (cond
     (number? syntax) {:op  :const
                       :val syntax}
+    (boolean? syntax) {:op  :const
+                       :val syntax}
     (keyword? syntax) {:op  :const
                        :val syntax}
     (symbol? syntax) {:op   :local
@@ -87,3 +89,32 @@
         :else (bad-input syntax)))
     :else (bad-input syntax)))
 
+(t/ann emit [AST -> CLJSyntax])
+(defmulti emit :op)
+
+(defmethod emit :const
+  [{:keys [val]}]
+  val)
+
+(defmethod emit :local
+  [{:keys [name]}]
+  name)
+
+(defmethod emit :lambda
+  [{:keys [param body]}]
+  `(fn [~param] ~(emit body)))
+
+(defmethod emit :if
+  [{:keys [pred then else]}]
+  `(if ~(emit pred)
+     ~(emit then)
+     ~(emit else)))
+
+(defmethod emit :let
+  [{:keys [name init body]}]
+  `(let [~name ~(emit init)]
+     ~(emit body)))
+
+(defmethod emit :app
+  [{:keys [rator rand]}]
+  `(~(emit rator) ~(emit rand)))

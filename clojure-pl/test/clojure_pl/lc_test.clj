@@ -41,4 +41,20 @@
                  :rator {:op   :local
                          :name 'a}
                  :rand  {:op  :const
-                         :val 1}}})))
+                         :val 1}}})
+    (is= (-> '((lambda [a] a) 3)
+             analyze
+             emit
+             eval)
+         3)
+    (is= (-> '(let [a (lambda [x] x)]
+                (a 3))
+             analyze
+             emit
+             eval)
+         3)
+    (is= (-> '(if true 3 333)
+             analyze
+             emit
+             eval)
+         3)))
