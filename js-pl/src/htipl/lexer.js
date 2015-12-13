@@ -130,7 +130,7 @@ exports.TokenStream = function(input) {
 				str += ch;
 			}
 		}
-		return ch;
+		return str;
 	}
 
 	function read_string() {

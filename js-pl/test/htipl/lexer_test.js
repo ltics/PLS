@@ -1,4 +1,4 @@
-var lexer = require('../../src/htipl/lexer')
+var lexer = require('../../src/htipl/lexer');
 
 var assert = require('assert');
 describe('lexer test', function() {
@@ -27,8 +27,36 @@ describe('lexer test', function() {
 		it('should get number token from stream', function() {
 			var inputstream = lexer.InputStream("333.3");
 			var tokenstream = lexer.TokenStream(inputstream);
-			assert.deepEqual(tokenstream.peek(), { type: 'num', value: 333.3 });
-			assert.deepEqual(tokenstream.next(), { type: 'num', value: 333.3 });
+			assert.deepEqual(tokenstream.peek(), {
+				type: 'num',
+				value: 333.3
+			});
+			assert.deepEqual(tokenstream.next(), {
+				type: 'num',
+				value: 333.3
+			});
+			assert.equal(tokenstream.eof(), true);
+		});
+		it('should get string token from stream', function() {
+			var inputstream = lexer.InputStream("\"cleantha\" \"3\\3\"");
+			var tokenstream = lexer.TokenStream(inputstream);
+			assert.deepEqual(tokenstream.peek(), {
+				type: 'str',
+				value: "cleantha"
+			});
+			assert.deepEqual(tokenstream.next(), {
+				type: 'str',
+				value: "cleantha"
+			});
+			assert.equal(tokenstream.eof(), false);
+			assert.deepEqual(tokenstream.peek(), {
+				type: "str",
+				value: "33"
+			});
+			assert.deepEqual(tokenstream.next(), {
+				type: "str",
+				value: "33"
+			});
 			assert.equal(tokenstream.eof(), true);
 		});
 	});
