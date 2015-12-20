@@ -86,7 +86,7 @@
        (fresh [x]
          (== true x))))
    (lazy-seq '(_0)))
-;; sincethex in(== true x) is the one introduced by the fresh expression
+;; sincethex in (== true x) is the one introduced by the fresh expression
 ;; it is neither the x introduced in the run expression
 ;; nor the x introduced in the lambda expression(let).
 
