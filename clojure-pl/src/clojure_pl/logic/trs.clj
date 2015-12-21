@@ -254,4 +254,69 @@
        ((== 'oil x) s#)
        (s# u#)))
    (lazy-seq '(olive _0 oil)))
-;;Once the first conde line fails, it is as if that line were not there.
+;; once the first conde line fails, it is as if that line were not there.
+
+(= (run 2 [x]
+        (conde
+          ((== 'extra x) s#)
+          ((== 'virgin x) u#)
+          ((== 'olive x) s#)
+          ((== 'oil x) s#)
+          (s# u#)))
+   (lazy-seq '(extra olive)))
+;; just get first two values
+
+(= (run* [r]
+     (fresh [x y]
+       (== 'split x)
+       (== 'pea y)
+       (== (cons x (cons y '())) r)))
+   (lazy-seq '((split pea))))
+
+(run* [r]
+  (fresh [x y]
+    (conde
+      ((== 'split x) (== 'pea y))
+      ((== 'navy x) (== 'bean y))
+      (s# u#))
+    (== (cons x (cons y '())) r)))
+
+(run* [r]
+  (fresh [x y]
+    (conde
+      ((== 'split x) (== 'pea y))
+      ((== 'navy x) (== 'bean y))
+      (s# u#))
+    (== (cons x (cons y (cons 'soup '()))) r)))
+
+(defn teacupo
+  [x]
+  (conde
+    ((== 'tea x) s#)
+    ((== 'cup x) s#)
+    (s# u#)))
+
+(= (run* [x]
+     (teacupo x))
+   (lazy-seq '(tea cup)))
+
+(= (run* [r]
+     (fresh [x y]
+       (conde
+         ((teacupo x) (== true y) s#)
+         ((== false x) (== true y))
+         (s# u#))
+       (== (cons x (cons y ())) r)))
+   (lazy-seq '((false true) (tea true) (cup true))))
+;; From (teacupo x), x gets two associations, and from (== false x), x gets one association.
+
+(= (run* [r]
+     (fresh [x y z]
+       (conde
+         ((== y x) (fresh [x] (== z x)))
+         ((fresh [x] (== y x)) (== z x))
+         (s# u#))
+       (== (cons y (cons z ())) r)))
+   (lazy-seq '((_0 _1) (_0 _1))))
+;; it looks like both occurrences of _0 have come from the same variable
+;; and similarly for both occurrences of _1
