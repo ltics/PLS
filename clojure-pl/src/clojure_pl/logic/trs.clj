@@ -182,6 +182,76 @@
        (s# s#)
        (s# u#)))
    (lazy-seq '(_0)))
+
+(= (run* [q]
+     (conde
+       (u# s#)
+       (s# s#)))
+   (lazy-seq '(_0)))
+
+(= (run* [q]
+     (conde
+       (s# s#)
+       (s# s#)))
+   (lazy-seq '(_0 _0)))
 ;; conde is actually the miniKanren's condi. Core.logic offers no conde.
 ;; This means the order of results may not match what is shown when you use conde with miniKanren.
 ;; conde does not support defining an else clause. Just use a (s# ...) at the end of your conde.
+
+(= (run* [x]
+     (conde
+       ((== 'olive x) s#)
+       ((== 'oil x) s#)
+       (s# u#)))
+   (lazy-seq '(olive oil)))
+
+(= (run* [x]
+     (conde
+       ((== 'olive x) u#)
+       ((== 'oil x) s#)
+       (s# u#)))
+   (lazy-seq '(oil)))
+
+(= (run* [x]
+     (conde
+       ((== 'olive x) s#)
+       ((== 'oil x) s#)
+       (s# s#)))
+   (lazy-seq '(olive oil _0)))
+;; because (== 'olive x) succeeds; therefore, the answer is s#.
+;; The s# preserves the association of x to 'olive.
+;; To get the second value, we pretend that (== 'olive x) fails;
+;; this imagined failure refreshes x. Then (== 'oil x) succeeds.
+;; The s# preserves the association of x to 'oil.
+;; We then pretend that (== 'oil x) fails, which once again refreshes x.
+;; Since no more goals succeed, we are done.
+
+;; the law of conde => To get more values from conde,
+;; pretend that the successful conde line has failed,
+;; refreshing all variables that got an association from that line.
+
+;; the e in conde stands for every line, since every line can succeed.
+
+(= (run 1 [x]
+        (conde
+          ((== 'olive x) s#)
+          ((== 'oil x) s#)
+          (s# u#)))
+   (lazy-seq '(olive)))
+;; run 1 produces at most one value.
+
+(= (run* [x]
+     (conde
+       ((== 'virgin x) u#)
+       ((== 'olive x) s#)
+       (s# s#)
+       ((== 'oil x) s#)
+       (s# u#)))
+   (run* [x]
+     (conde
+       ((== 'olive x) s#)
+       ((s# s#))
+       ((== 'oil x) s#)
+       (s# u#)))
+   (lazy-seq '(olive _0 oil)))
+;;Once the first conde line fails, it is as if that line were not there.
