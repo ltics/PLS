@@ -67,6 +67,7 @@
 ;; (== v x) succeeds when x is fresh. q, x are all fresh variable
 
 ;; the law of fresh => If x is fresh, then (== v x) succeeds and associates x with v.
+;; if a fresh variable is associated it's no longer fresh and can not be associated any more.
 ;; the law of == (unification) => (≡v w)isthesameas(≡w v).
 
 (= (run* [q]
@@ -112,3 +113,75 @@
 ;; Within the inner fresh, x and y are different variables,
 ;; and since they are still fresh, they get different reified names.
 ;; Reifying r’s value reifies the fresh variables in the order in which they appear in the list.
+
+(= (run* [q]
+     (== false q)
+     (== true q))
+   (lazy-seq '()))
+;; The first goal (== false q) succeeds, associating false with q;
+;; true cannot then be associated with q, since q is no longer fresh.
+
+(= (run* [q]
+     (== false q)
+     (== false q))
+   (lazy-seq '(false)))
+;; In order for the run to succeed, both (== false q) and (== false q) must succeed
+;; The first goal succeeds while associating false with the fresh variable q.
+;; The second goal succeeds because although q is no longer fresh, false is already associated with it.
+
+(= (run* [q]
+     (let [x q]
+       (== true x)))
+   (lazy-seq '(true)))
+;; because q and x are the same.
+
+(= (run* [q]
+     (fresh [x]
+       (== x q)))
+   (lazy-seq '(_0)))
+;; because q starts out fresh and then q gets whatever association that x gets,
+;; but both x and q remain fresh.
+;; When one fresh variable is associated with another,
+;; we say they co-refer or share.
+
+(= (run* [q]
+     (fresh [x]
+       (== true x)
+       (== x q)))
+   (lazy-seq '(true)))
+;; co-refer law
+
+(= (run* [q]
+     (fresh [x]
+       (== x q)
+       (== true x)))
+   (lazy-seq '(true)))
+;; because the first goal ensures that whatever association x gets, q also gets.
+;; co-refer law
+
+(= (run* [q]
+     (fresh [x]
+       (== (= x q) q)))
+   (lazy-seq '(false)))
+
+(= (run* [q]
+     (let [x q]
+       (fresh [q]
+         (== (= x q) x))))
+   (lazy-seq '(false)))
+;; Every variable introduced by fresh (or run) is different from every other variable introduced by fresh (or run).
+
+(= (run* [q]
+     (conde
+       (u# s#)
+       (s# u#)))
+   (lazy-seq '()))
+
+(= (run* [q]
+     (conde
+       (s# s#)
+       (s# u#)))
+   (lazy-seq '(_0)))
+;; conde is actually the miniKanren's condi. Core.logic offers no conde.
+;; This means the order of results may not match what is shown when you use conde with miniKanren.
+;; conde does not support defining an else clause. Just use a (s# ...) at the end of your conde.
