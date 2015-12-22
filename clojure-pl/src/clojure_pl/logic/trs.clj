@@ -320,3 +320,79 @@
    (lazy-seq '((_0 _1) (_0 _1))))
 ;; it looks like both occurrences of _0 have come from the same variable
 ;; and similarly for both occurrences of _1
+
+(= (run* [r]
+     (fresh [x y z]
+       (conde
+         ((== y x) (fresh [x] (== z x)))
+         ((fresh (x) (== y x)) (== z x))
+         (s# u#))
+       (== false x)
+       (== (cons y (cons z ())) r)))
+   (lazy-seq '((false _0) (_0 false))))
+;; clearly shows that the two occurrences of _0 and _1 in the previous frame represent different variables.
+;; fresh 会开一个新的scope来放逻辑变量 所以第一个y是和外层的x associate 第一个z适合fresh的x associate
+;; 第二个y是和fresh的xassociate 第二个z是和外层的x associate
+
+(= (run* [q]
+     (== false q)
+     (== true q))
+   (lazy-seq '()))
+
+(= (run* [q]
+     (let [_ (== false q)
+           ;; q is associated with true
+           b (== true q)]
+       b))
+   (run* [q]
+     (let [_ (== false q)
+           b (== true q)]
+       #(b %)))
+   (lazy-seq '(true)))
+
+(= (run* [q]
+     (let [a (== false q)
+           _ (== true q)]
+       a))
+   (lazy-seq '(false)))
+;; which shows that (== true q) and (== false q) are expressions, each of whose value is a goal.
+;; But, here we only treat the (== false q) expression’s value, b, as a goal.
+;; == unify操作表达式返回的函数一个lambda 是run*最后回去调用的
+
+(= (run* [q]
+     (let [_ (== true q)
+           b (fresh [x]
+               ;; q is associated with x
+               ;; and will associate any value x associated
+               (== x q)
+               (== false x))
+           _ (conde
+               ((== true q) s#)
+               (s# (== false q)))]
+       b))
+   (lazy-seq '(false)))
+
+(= (run* [q]
+     (let [a (== true q)
+           ;; q is associated with true
+           _ (fresh [x]
+               (== x q)
+               (== false x))
+           _ (conde
+               ((== true q) s#)
+               (s# (== false q)))]
+       a))
+   (lazy-seq '(true)))
+
+(= (run* [q]
+     (let [_ (== true q)
+           _ (fresh [x]
+               (== x q)
+               (== false x))
+           c (conde
+               ;; q is associated with true or false
+               ((== true q) s#)
+               (s# (== false q)))]
+       c))
+   (lazy-seq '(true false)))
+;; shows that (== ...), (fresh ...), and (conde ...) are expressions, each of whose value is a goal.
