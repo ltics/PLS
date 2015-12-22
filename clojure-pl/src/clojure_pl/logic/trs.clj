@@ -5,6 +5,7 @@
 ;; a relation is just a function returns a goal result
 ;; s# is successful goal
 ;; f# is failed goal
+;; run 里返回的list里面的值就是fresh变量q所associated的值
 
 (= (run* [q]
      u#)
@@ -457,4 +458,41 @@
 ;; Because variables introduced by fresh are values, and each argument to cons can be any value.
 ;; in clojure/core.logic we should use lcons to avoid ISeq cast problem
 
+(= (run* [r]
+     (fresh [v]
+       (resto '(a c o r n) v)
+       (firsto v r)))
+   (lazy-seq '(c)))
+;; The process of transforming (car (cdr l)) into (cdro l v) and (caro v r) is called unnesting.
 
+(= (run* [r]
+     (fresh [x y]
+       (resto '(grape raisin pear) x)
+       (firsto '((a) (b) (c)) y)
+       (== (lcons x y) r)))
+   (lazy-seq '(((raisin pear) a))))
+
+(= (run* [q]
+     (resto '(a c o r n) '(c o r n))
+     (== true q))
+   (lazy-seq '(true)))
+
+(= (run* [q]
+     (resto '(a c o r n) '(o r n))
+     (== true q))
+   (lazy-seq '()))
+;; because (c o r n) is the cdr of (a c o r n).
+
+(= (run* [x]
+     (resto '(c o r n) `(~x ~'r ~'n)))
+   (run* [x]
+     (resto '(c o r n) (list x 'r 'n)))
+   (lazy-seq '(o)))
+;; because (o r n) is the cdr of (c o r n), so x gets associated with o.
+
+(= (run* [l]
+     (fresh [x]
+       (resto l '(c o r n))
+       (firsto l x)
+       (== 'a x)))
+   (lazy-seq '((a c o r n))))
