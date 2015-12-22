@@ -396,3 +396,65 @@
        c))
    (lazy-seq '(true false)))
 ;; shows that (== ...), (fresh ...), and (conde ...) are expressions, each of whose value is a goal.
+
+(= (run* [r]
+     (fresh [y x]
+       (== `(~y ~x) r)))
+   (lazy-seq '((_0 _1))))
+;; because the variables in (x y) have been introduced by fresh.
+
+(= (run* [r]
+     (fresh [v w]
+       (== (let [x v
+                 y w]
+             `(~x ~y))
+           r)))
+   (lazy-seq '((_0 _1))))
+;; because v and w are variables introduced by fresh.
+
+(= (run* [r]
+     (firsto '(a c o r n) r))
+   (lazy-seq '(a)))
+;; r is associated with 'a because 'a is the car of '(a c o r n).
+;; firsto is also a relation like == fresh conde that return a goal
+
+(= (run* [q]
+     (firsto '(a c o r n) 'a)
+     (== true q))
+   (lazy-seq '(true)))
+
+(= (run* [q]
+     (firsto '(a c o r n) 'b)
+     (== true q))
+   (lazy-seq '()))
+;; because a is the car of (a c o r n).
+;; 只有在中间的relation的goal都是succeed的 q才会associated到unification的值
+
+(defn caro
+  [p a]
+  (fresh [d]
+    (== (lcons a d) p)))
+
+(= (run* [r]
+     (fresh [x y]
+       (firsto `(~r ~y) x)
+       (== 'pear x)))
+   (run* [r]
+     (fresh [x y]
+       (caro `(~r ~y) x)
+       (== 'pear x)))
+   (lazy-seq '(pear)))
+;; since x is associated with the car of (r y), which is the fresh variable r.
+;; Then x is associated with pear, which in turn associates r with pear.
+;; co-refer here.
+
+(= (run* [r]
+     (fresh [x y]
+       (firsto '(grape raisin pear) x)
+       (firsto '((a) (b) (c)) y)
+       (== (lcons x y) r)))
+   (lazy-seq '((grape a))))
+;; Because variables introduced by fresh are values, and each argument to cons can be any value.
+;; in clojure/core.logic we should use lcons to avoid ISeq cast problem
+
+
