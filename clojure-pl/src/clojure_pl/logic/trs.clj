@@ -2,6 +2,10 @@
   (:refer-clojure :exclude [== reify inc])
   (:use [clojure.core.logic]))
 
+;; 一个relation或者"目标"(函数的关系式对应物)不区分参数与返回值 firsto resto conso
+;; 因而使得"逆向"运算成为可能 从而对一个已知的"返回"值可以得到一个或几个可能的参数
+;; conso这一类relation不区分参数与返回值 将"返回值"作为额外的参数放在参数表的最后一个位置
+
 ;; a relation is just a function returns a goal result
 ;; s# is successful goal
 ;; f# is failed goal
@@ -599,3 +603,20 @@
      (eqo 'plum 'plum)
      (== true q))
    (lazy-seq '(true)))
+
+(defn pair? [x]
+  (or (lcons? x)
+      (and (coll? x)
+           (seq? x))))
+
+(lcons 'a 'b)
+;; => (a . b)
+;; a scheme way to create pair
+
+(defn pairo
+  [p]
+  (fresh [a d]
+    (conso a d p)))
+
+(run∗ (r) (fresh (x y)
+            (≡ (cons x (cons y salad)) r)))
