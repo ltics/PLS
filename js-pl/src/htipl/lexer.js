@@ -40,7 +40,8 @@ exports.InputStream = function(input) {
 
 exports.TokenStream = function(input) {
 	var current = null;
-	var keywords = ["if", "then", "else", "lambda", "λ", "true", "false"];
+	var keywords = ["if", "then", "else", "lambda", "λ"];
+	var booleans = ["true", "false"];
 	return {
 		next: next,
 		peek: peek,
@@ -50,6 +51,10 @@ exports.TokenStream = function(input) {
 
 	function is_keyword(x) {
 		return (keywords.indexOf(x) > -1);
+	}
+
+	function is_boolean(x) {
+		return (booleans.indexOf(x) > -1);
 	}
 
 	function is_digit(ch) {
@@ -106,6 +111,12 @@ exports.TokenStream = function(input) {
 
 	function read_ident() {
 		var id = read_while(is_id);
+		if (is_boolean(id)) {
+			return {
+				type: "bool",
+				value: id == "true" ? true : false
+			}
+		}
 		return {
 			type: is_keyword(id) ? "kw" : "var",
 			value: id

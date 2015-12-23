@@ -59,5 +59,19 @@ describe('lexer test', function() {
 			});
 			assert.equal(tokenstream.eof(), true);
 		});
+		it('should get boolean token from stream', function() {
+			var inputstream = lexer.InputStream("true false");
+			var tokenstream = lexer.TokenStream(inputstream);
+			assert.deepEqual(tokenstream.next(), {
+				type: "bool",
+				value: true
+			});
+			assert.equal(tokenstream.eof(), false);
+			assert.deepEqual(tokenstream.next(), {
+				type: "bool",
+				value: false
+			});
+			assert.equal(tokenstream.eof(), true);
+		});
 	});
 });
