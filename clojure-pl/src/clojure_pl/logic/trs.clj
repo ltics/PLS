@@ -490,9 +490,74 @@
    (lazy-seq '(o)))
 ;; because (o r n) is the cdr of (c o r n), so x gets associated with o.
 
+(defn cdro
+  [p d]
+  (fresh [a]
+    (== (lcons a d) p)))
+
 (= (run* [l]
      (fresh [x]
        (resto l '(c o r n))
        (firsto l x)
+       (== 'a x))
+     (fresh [x]
+       (cdro l '(c o r n))
+       (firsto l x)
        (== 'a x)))
    (lazy-seq '((a c o r n))))
+;; because if the cdr of l is (list 'c 'o 'r 'n), then l must be the list (list a 'c 'o 'r 'n),
+;; where a is the fresh variable introduced in the definition of cdro.
+;; Taking the caro of l associates the car of l with x.
+;; When we associate x with 'a, we also associate a, the car of l, with 'a, so l is associated with the list (list 'a 'c 'o 'r 'n).
+
+(= (run* [l]
+     (conso '(a b c) '(d e) l))
+   (lazy-seq '(((a b c) d e))))
+;; since conso associates l with (cons '(a b c) '(d e)).
+
+(= (run* [x]
+     (conso x '(a b c) '(d a b c)))
+   (lazy-seq '(d)))
+;; Since (cons d (a b c)) is (d a b c), conso associates x with d.
+
+(= (run* [r]
+     (fresh [x y z]
+       (== `(~'e ~'a ~'d ~x) r)
+       (conso y `(~'a ~z ~'c) r)))
+   (lazy-seq '((e a d c))))
+;; because first we associate r with a list whose last element is the fresh variable x.
+;; We then perform the conso, associating x with c,z with d,and y with e.
+
+(= (run* [x]
+     (conso x `(~'a ~x ~'c) `(~'d ~'a ~x ~'c)))
+   (lazy-seq '(d)))
+;; What value can we associate with x so that (cons x (a x c)) is (d a x c)?
+;; Obviously, d is the value.
+
+(= (run* [l]
+     (fresh [x]
+       (== `(~'d ~'a ~x ~'c) l)
+       (conso x `(~'a ~x ~'c) l)))
+   (lazy-seq '((d a d c))))
+;; because l is (list 'd 'a x 'c).
+;; Then when we conso x onto (list 'a x 'c), we associate x with 'd.
+
+(= (run* [l]
+     (fresh [d x y w s]
+       (conso w '(a n s) s)
+       (resto l s)
+       (firsto l x)
+       (== 'b x)
+       (resto l d)
+       (firsto d y)
+       (== 'e y)))
+   (lazy-seq '((b e a n s))))
+;; l must clearly be a five element list, since s is (cdr l).
+;; Since l is fresh, (cdro l s) places a fresh variable in the first position of l,
+;; while associating w and (a n s) with the second position and the cdr of the cdr of l,
+;; respectively. The first variable in l gets associated with x,
+;; which in turn gets associated with 'b.
+;; The cdr of l is a list whose car is the variable w.
+;; That variable gets associated with y, which in turn gets associated with e.
+
+
