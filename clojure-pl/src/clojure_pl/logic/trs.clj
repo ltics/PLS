@@ -6,6 +6,7 @@
 ;; 因而使得"逆向"运算成为可能 从而对一个已知的"返回"值可以得到一个或几个可能的参数
 ;; conso这一类relation不区分参数与返回值 将"返回值"作为额外的参数放在参数表的最后一个位置
 
+;; run*/run is not a relation cause it does not return a goal
 ;; a relation is just a function returns a goal result
 ;; s# is successful goal
 ;; f# is failed goal
@@ -618,5 +619,61 @@
   (fresh [a d]
     (conso a d p)))
 
-(run∗ (r) (fresh (x y)
-            (≡ (cons x (cons y salad)) r)))
+(= (run* [r]
+     (fresh [x y]
+       (== (lcons x (lcons y 'salad)) r)))
+   (lazy-seq `(~(lcons '_0 (lcons '_1 'salad)))))
+;; => ((_0 _1 . salad))
+;; r is associated with (_0 _1 . salad)
+
+(= (run* [q]
+     (pairo (lcons q q))
+     (== true q))
+   (lazy-seq '(true)))
+
+(= (run* [q]
+     (pairo '())
+     (== true q))
+   (lazy-seq '()))
+
+(= (run* [q]
+     (pairo 'pair)
+     (== true q))
+   (lazy-seq '()))
+
+(= (run* [x]
+     (pairo x))
+   (lazy-seq `(~(lcons '_0 '_1))))
+;; x can only unified to a pair with two fresh variable
+;; x is associated with a pair (_0 . _1)
+
+(= (run* [r]
+     (pairo (lcons r 'pear)))
+   (lazy-seq '(_0)))
+;; r can unify with any value to construct a pair
+;; _0 just stand that r is a fresh variable
+
+;; define caro cdro use conso
+;; Conso the Magnificento
+(defn caro
+  [p a]
+  (fresh [d]
+    (conso a d p)))
+
+(defn cdro
+  [p d]
+  (fresh [a]
+    (conso a d p)))
+
+(= (run* [r]
+     (fresh [x y]
+       (caro `(~r ~y) x)
+       (== 'pear x)))
+   (lazy-seq '(pear)))
+
+(= (run* [l]
+     (fresh [x]
+       (cdro l '(c o r n))
+       (firsto l x)
+       (== 'a x)))
+   (lazy-seq '((a c o r n))))
