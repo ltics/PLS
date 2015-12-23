@@ -617,7 +617,7 @@
 (defn pairo
   [p]
   (fresh [a d]
-    (conso a d p)))
+    (== (lcons a d) p)))
 
 (= (run* [r]
      (fresh [x y]
@@ -653,7 +653,7 @@
 ;; r can unify with any value to construct a pair
 ;; _0 just stand that r is a fresh variable
 
-;; define caro cdro use conso
+;; define caro cdro pairo use conso
 ;; Conso the Magnificento
 (defn caro
   [p a]
@@ -663,6 +663,11 @@
 (defn cdro
   [p d]
   (fresh [a]
+    (conso a d p)))
+
+(defn pairo
+  [p]
+  (fresh [a d]
     (conso a d p)))
 
 (= (run* [r]
