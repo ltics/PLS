@@ -239,10 +239,10 @@
 ;; the e in conde stands for every line, since every line can succeed.
 
 (= (run 1 [x]
-        (conde
-          ((== 'olive x) s#)
-          ((== 'oil x) s#)
-          (s# u#)))
+     (conde
+       ((== 'olive x) s#)
+       ((== 'oil x) s#)
+       (s# u#)))
    (lazy-seq '(olive)))
 ;; run 1 produces at most one value.
 
@@ -263,12 +263,12 @@
 ;; once the first conde line fails, it is as if that line were not there.
 
 (= (run 2 [x]
-        (conde
-          ((== 'extra x) s#)
-          ((== 'virgin x) u#)
-          ((== 'olive x) s#)
-          ((== 'oil x) s#)
-          (s# u#)))
+     (conde
+       ((== 'extra x) s#)
+       ((== 'virgin x) u#)
+       ((== 'olive x) s#)
+       ((== 'oil x) s#)
+       (s# u#)))
    (lazy-seq '(extra olive)))
 ;; just get first two values
 
@@ -682,3 +682,47 @@
        (firsto l x)
        (== 'a x)))
    (lazy-seq '((a c o r n))))
+
+(defn listo
+  [l]
+  (conde
+    ((emptyo l) s#)
+    ((pairo l)
+      (fresh [d]
+        (resto l d)
+        (listo d)))
+    (s# u#)))
+
+;; in the implementation of listo
+(comment
+  (fresh [d]
+    (resto l d)
+    (listo d)))
+;; It is an unnesting of (list? (cdr l)).
+;; First we take the cdr of l and associate it with a fresh variable d,
+;; and then we use d in the recursive call.
+
+(= (run* [x]
+     (listo `(~'a ~'b ~x ~'d)))
+   (lazy-seq '(_0)))
+;; since x remains fresh. x does not associated with any value.
+;; When determining the goal returned by listo, it is not necessary to determine the value of x.
+;; Therefore x remains fresh, which means that the goal returned from the call to list o succeeds for all values associated with x.
+
+(= (run 1 [x]
+     (listo (lcons 'a (lcons 'b (lcons 'c x)))))
+   (run 1 [x]
+     (listo (llist 'a 'b 'c x)))
+   (lazy-seq '(())))
+;;  llist is a convenience macro that expands out into nested lcons expressions.
+;; x is associated with '() Because(a b c . x)isaproperlistwhenxis the empty list.
+;; When listo reaches the end of (a b c . x), (nullo x) succeeds and associates x with the empty list.
+
+(comment
+  (run* [x]
+    (listo (llist 'a 'b 'c x))))
+;; will run forever
+
+(= (run 5 [x]
+     (listo (llist 'a 'b 'c x)))
+   (lazy-seq '(() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))))
