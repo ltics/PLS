@@ -585,3 +585,17 @@
      (nullo q))
    (lazy-seq '(())))
 ;; associate q with empty list
+
+(defn eqo [x y]
+  (== x y))
+;; Define eqo using ==.
+
+(= (run* [q]
+     (eqo 'pear 'plum)
+     (== true q))
+   (lazy-seq '()))
+
+(= (run* [q]
+     (eqo 'plum 'plum)
+     (== true q))
+   (lazy-seq '(true)))
