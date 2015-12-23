@@ -560,4 +560,28 @@
 ;; The cdr of l is a list whose car is the variable w.
 ;; That variable gets associated with y, which in turn gets associated with e.
 
+(= (run* [q]
+     (emptyo '(grape raisin pear))
+     (== true q))
+   (lazy-seq '()))
 
+(= (run* [q]
+     (emptyo '())
+     (== true q))
+   (lazy-seq '(true)))
+
+(defn nullo
+  [x]
+  (== () x))
+
+(= (run* [q]
+     (== q '(grape raisin pear))
+     (emptyo q))
+   (lazy-seq '()))
+
+(= (run* [q]
+     (emptyo q))
+   (run* [q]
+     (nullo q))
+   (lazy-seq '(())))
+;; associate q with empty list
