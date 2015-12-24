@@ -73,5 +73,19 @@ describe('lexer test', function() {
 			});
 			assert.equal(tokenstream.eof(), true);
 		});
+		it('should get keyword token from stream', function() {
+			var inputstream = lexer.InputStream("lambda λ");
+			var tokenstream = lexer.TokenStream(inputstream);
+			assert.deepEqual(tokenstream.next(), {
+				type: "kw",
+				value: "lambda"
+			});
+			assert.equal(tokenstream.eof(), false);
+			assert.deepEqual(tokenstream.next(), {
+				type: "kw",
+				value: "λ"
+			});
+			assert.equal(tokenstream.eof(), true);
+		});
 	});
 });
