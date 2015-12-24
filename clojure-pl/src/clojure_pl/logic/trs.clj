@@ -726,3 +726,64 @@
 (= (run 5 [x]
      (listo (llist 'a 'b 'c x)))
    (lazy-seq '(() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))))
+
+(defn lol?
+  "list of lists?"
+  [l]
+  (cond
+    (empty? l) true
+    (list? (first l)) (lol? (rest l))
+    :else false))
+
+  (defn lolo
+    [l]
+    (conde
+      ((nullo l) s#)
+      ((fresh [a]
+         (firsto l a)
+         (listo a))
+        (fresh [d]
+          (cdro l d)
+          (lolo d)))
+      (s# u#)))
+;; To transform a function whose value is a Boolean into a function whose value is a goal,
+;; replace cond with conde and unnest each question and answer. Unnest the answer true (or false) by replacing it with s# (or u#).
+;; the value of (lolo l) always a goal
+
+(= (run 1 [l]
+     (lolo l))
+   (lazy-seq '(())))
+;; Since l is fresh, (nullo l) succeeds and in the process associates l with ().
+
+(= (run* [q]
+     (fresh [x y]
+       (lolo `((~'a ~'b) (~x ~'c) (~'d ~y)))
+       (== true q)))
+   (run* [q]
+     (fresh [x y]
+       (lolo `((~'a ~'b) (~x ~'c) (~'d ~y))))
+     (== true q))
+   (lazy-seq '(true)))
+;; since ((a b) (x c) (d y)) is a list of lists.
+
+(llist '(a b) 'x)
+;; => ((a b) . x)
+(llist '(a b) (llist '(x c) '()))
+;; => ((a b) (x c))
+(llist '(a b) '(x c) '(d y))
+;; => ((a b) (x c) d y)
+
+(= (run 1 [q]
+     (fresh [x]
+       (lolo (llist '(a b) x))
+       (== true q)))
+   (lazy-seq '(true)))
+
+(= (run 1 [x]
+     (lolo (llist '(a b) '(c d) x)))
+   (lazy-seq '(())))
+
+(= (run 5 [x]
+     (lolo (llist '(a b) '(c d) x)))
+   (lazy-seq '(() (()) ((_0)) (() ()) ((_0 _1)))))
+;; 只要能组成list of lists即可 结果与miniKanren的略有出入
