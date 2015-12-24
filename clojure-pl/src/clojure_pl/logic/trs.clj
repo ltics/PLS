@@ -655,30 +655,30 @@
 
 ;; define caro cdro pairo use conso
 ;; Conso the Magnificento
-(defn caro
+(defn caro2
   [p a]
   (fresh [d]
     (conso a d p)))
 
-(defn cdro
+(defn cdro2
   [p d]
   (fresh [a]
     (conso a d p)))
 
-(defn pairo
+(defn pairo2
   [p]
   (fresh [a d]
     (conso a d p)))
 
 (= (run* [r]
      (fresh [x y]
-       (caro `(~r ~y) x)
+       (caro2 `(~r ~y) x)
        (== 'pear x)))
    (lazy-seq '(pear)))
 
 (= (run* [l]
      (fresh [x]
-       (cdro l '(c o r n))
+       (cdro2 l '(c o r n))
        (firsto l x)
        (== 'a x)))
    (lazy-seq '((a c o r n))))
@@ -687,7 +687,7 @@
   [l]
   (conde
     ((emptyo l) s#)
-    ((pairo l)
+    ((pairo2 l)
       (fresh [d]
         (resto l d)
         (listo d)))
@@ -787,3 +787,41 @@
      (lolo (llist '(a b) '(c d) x)))
    (lazy-seq '(() (()) ((_0)) (() ()) ((_0 _1)))))
 ;; 只要能组成list of lists即可 结果与miniKanren的略有出入
+
+(defn twinso
+  [s]
+  (fresh [x y]
+    (conso x y s)
+    (conso x '() y)))
+
+(defn twinso2
+  [s]
+  (fresh [x]
+    (== `(~x ~x) s)))
+
+(= (run* [q]
+     (twinso '(tofu tofu))
+     (== true q))
+   (lazy-seq '(true)))
+
+(= (run* [z]
+     (twinso `(~z ~'tofu)))
+   (run* [z]
+     (twinso (llist z 'tofu '())))
+   (run* [z]
+     (twinso (lcons z (lcons 'tofu '()))))
+   (lazy-seq '(tofu)))
+
+(= '(a)
+   (lcons 'a '())
+   (llist 'a '()))
+
+;; z is associated with tofu
+;; Because (z tofu) is a twin only when z is associated with tofu.
+;; through the defination, in the call to twinso the first conso associates x with the car of (z tofu), which is z,
+;; and associates y with the cdr of (z tofu), which is (tofu).
+;; Remember that (tofu) is the same as (tofu . ()).
+;; The second conso associates x, and therefore z, with the car of y, which is tofu.
+
+
+
