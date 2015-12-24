@@ -904,3 +904,29 @@
    (lazy-seq ['((g g) (e e) (_0 _0))
               '((g g) (e e) (_0 _0) (_1 _1))
               '((g g) (e e) (_0 _0) (_1 _1) (_2 _2))]))
+
+(defn listofo
+  "list of item which satisfy specific predicate"
+  [predo l]
+  (conde
+    ((nullo l) s#)
+    [(fresh [a]
+       (firsto l a)
+       (predo a))
+     (fresh (d)
+       (resto l d)
+       (listofo predo d))]
+    (s# u#)))
+
+(= (run 3 [out]
+     (fresh [w x y z]
+       (== (llist `(~'g ~'g) `(~'e ~w) `(~x ~y) z) out)
+       (listofo twinso out)))
+   (lazy-seq ['((g g) (e e) (_0 _0))
+              '((g g) (e e) (_0 _0) (_1 _1))
+              '((g g) (e e) (_0 _0) (_1 _1) (_2 _2))]))
+
+;;redefine loto use listofo
+(defn loto
+  [l]
+  (listofo twinso l))
