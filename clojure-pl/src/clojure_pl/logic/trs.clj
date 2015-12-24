@@ -735,17 +735,17 @@
     (list? (first l)) (lol? (rest l))
     :else false))
 
-  (defn lolo
-    [l]
-    (conde
-      ((nullo l) s#)
-      ((fresh [a]
-         (firsto l a)
-         (listo a))
-        (fresh [d]
-          (cdro l d)
-          (lolo d)))
-      (s# u#)))
+(defn lolo
+  [l]
+  (conde
+    ((nullo l) s#)
+    ((fresh [a]
+       (firsto l a)
+       (listo a))
+      (fresh [d]
+        (cdro l d)
+        (lolo d)))
+    (s# u#)))
 ;; To transform a function whose value is a Boolean into a function whose value is a goal,
 ;; replace cond with conde and unnest each question and answer. Unnest the answer true (or false) by replacing it with s# (or u#).
 ;; the value of (lolo l) always a goal
@@ -823,5 +823,84 @@
 ;; Remember that (tofu) is the same as (tofu . ()).
 ;; The second conso associates x, and therefore z, with the car of y, which is tofu.
 
+(defn loto
+  [l]
+  (conde
+    ((nullo l) s#)
+    ((fresh [a]
+       (caro l a)
+       (twinso a))
+      (fresh [d]
+        (cdro l d)
+        (loto d)))
+    (s# u#)))
 
+(defn loto2
+  [l]
+  (conde
+    ((nullo l) s#)
+    [(fresh [a]
+       (caro l a)
+       (twinso a))
+     (fresh [d]
+       (cdro l d)
+       (loto d))]
+    (s# u#)))
+;; list-of-twins.
 
+(= (run 1 [z]
+     (loto (lcons '(g g) z)))
+   (lazy-seq '(())))
+;; Because ((g g) . z) is a list of twins when z is the empty list.
+;; (g g) . '()), which is the same as ((g g)).
+;; through the defination of loto, in the first call to loto, l is the list ((g g) . z).
+;; Since this list is not null, (nullo l) fails and we move on to the second conde line.
+;; In the second conde line, d is associated with the cdr of ((g g) . z), which is z.
+;; The variable d is then passed in the recursive call to loto.
+;; Since the variable z associated with d is fresh, (nullo l) succeeds and associates d and therefore z with the empty list.
+
+(= (run 5 [q]
+     (loto (lcons '(g g) q)))
+   (lazy-seq ['()
+              '((_0 _0))
+              '((_0 _0) (_1 _1))
+              '((_0 _0) (_1 _1) (_2 _2))
+              '((_0 _0) (_1 _1) (_2 _2) (_3 _3))]))
+;; _n Each n corresponds to a fresh variable that has been introduced in the question of the second conde line of loto.
+;; ((g g) . ((_0 _0) (_1 _1) (_2 _2)))
+;; which is the same as
+;; ((g g) (_0 _0) (_1 _1) (_2 _2)).
+;; 有一个点就表示是cons上去的 是一个pair scheme里的基础知识
+;; http://download.plt-scheme.org/doc/html/guide/Pairs__Lists__and_Scheme_Syntax.html
+;; > (cons (list 2 3) 1)
+;; ((2 3) . 1)
+;; > (cons 1 (list 2 3))
+;; (1 2 3)
+
+(= (llist '(a b) '(b c) 'c)
+   (lcons '(a b) (lcons '(b c) 'c)))
+;; => ((a b) (b c) . c)
+
+(= (list 'a 'b) `(~'a ~'b) `(~@`(~'a ~'b)))
+;;(a b)
+
+(= (run 5 [r]
+     (fresh [w x y z]
+       (loto (llist `(~'g ~'g) `(~'e ~w) `(~x ~y) z))
+       (== `(~w (~x ~y) ~z) r)))
+   (lazy-seq ['(e (_0 _0) ())
+              '(e (_0 _0) ((_1 _1)))
+              '(e (_0 _0) ((_1 _1) (_2 _2)))
+              '(e (_0 _0) ((_1 _1) (_2 _2) (_3 _3)))
+              '(e (_0 _0) ((_1 _1) (_2 _2) (_3 _3) (_4 _4)))]))
+;; ((g g) (e e) (_0 _0) . ((_1 _1) (_2 _2)))
+;; which is the same as
+;; ((g g) (e e) (_0 _0) (_1 _1) (_2 _2))
+
+(= (run 3 [out]
+     (fresh [w x y z]
+       (== (llist `(~'g ~'g) `(~'e ~w) `(~x ~y) z) out)
+       (loto out)))
+   (lazy-seq ['((g g) (e e) (_0 _0))
+              '((g g) (e e) (_0 _0) (_1 _1))
+              '((g g) (e e) (_0 _0) (_1 _1) (_2 _2))]))
