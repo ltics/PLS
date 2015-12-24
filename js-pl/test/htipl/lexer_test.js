@@ -87,5 +87,19 @@ describe('lexer test', function() {
 			});
 			assert.equal(tokenstream.eof(), true);
 		});
+		it('should get var token from stream', function() {
+			var inputstream = lexer.InputStream("cleantha _333");
+			var tokenstream = lexer.TokenStream(inputstream);
+			assert.deepEqual(tokenstream.next(), {
+				type: "var",
+				value: "cleantha"
+			});
+			assert.equal(tokenstream.eof(), false);
+			assert.deepEqual(tokenstream.next(), {
+				type: "var",
+				value: "_333"
+			});
+			assert.equal(tokenstream.eof(), true);
+		});
 	});
 });
