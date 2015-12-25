@@ -1011,6 +1011,9 @@
 ;; => (pasta x fagioli . y)
 ;; 一个点就表示是cons的关系 scheme中的定义
 
+(= (llist 'pasta 'e 'fagioli '())
+   '(pasta e fagioli))
+
 (= (run* [r]
      (fresh [x y]
        (membero 'e `(~'pasta ~x ~'fagioli ~y))
@@ -1163,3 +1166,33 @@
 ;; with pmembero*** All of the odd positions are proper lists.
 ;; Because in the third conde line the cdr of l is the empty list.
 ;; the second conde line the cdr of l is a pair.
+
+(defn first-value
+  [l]
+  (run 1 [y]
+    (membero y l)))
+
+(= (first-value '(pasta e fagioli))
+   (lazy-seq '(pasta)))
+;; y is associated with 'pasta
+
+(defn memberrevo
+  "reverse of membero"
+  [x l]
+  (conde
+    ((emptyo l) u#)
+    (s# (fresh [d]
+          (resto l d)
+          (memberrevo x d)))
+    (s# (eq-caro l x))))
+;; 将去car的操作滞后了 所以会先associate最后一个元素
+
+(not= (run* [x]
+        (memberrevo x '(pasta e fagioli)))
+      (lazy-seq '(fagioli e pasta)))
+;; not working as expected. Is is because of lack of else clause in core.logic
+
+(defn reverse-list
+  [l]
+  (run* [y]
+    (memberrevo y l)))
