@@ -887,6 +887,7 @@
 (= (run 5 [r]
      (fresh [w x y z]
        (loto (llist `(~'g ~'g) `(~'e ~w) `(~x ~y) z))
+       ;;should not use `((~'g ~'g) (~'e ~w) (~x ~y) ~z)
        (== `(~w (~x ~y) ~z) r)))
    (lazy-seq ['(e (_0 _0) ())
               '(e (_0 _0) ((_1 _1)))
@@ -985,3 +986,54 @@
 
 (= (identity '(hummus with pita))
    (lazy-seq '(hummus with pita)))
+
+(= (run* [x]
+     (membero 'e (llist 'pasta x 'fagioli)))
+   (lazy-seq '(e)))
+;; The list contains three values with a variable in the middle.
+;; The member o function determines that x’s value should be 'e.
+;; Because (membero e (pasta e fagioli)) succeeds. so x is associated with 'e
+
+(= (run 1 [x]
+     (membero 'e (llist 'pasta 'e x 'fagioli)))
+   (lazy-seq '(_0)))
+;; because the recursion succeeds before it gets to the variable x.
+
+(= (run 1 [x]
+     (membero 'e (llist 'pasta x 'e 'fagioli)))
+   (lazy-seq '(e)))
+;; because the recursion succeeds when it gets to the variable x.
+
+`(~'pasta ~'x ~'fagioli ~'y)
+;; => (pasta x fagioli y)
+
+(llist 'pasta 'x 'fagioli 'y)
+;; => (pasta x fagioli . y)
+;; 一个点就表示是cons的关系 scheme中的定义
+
+(= (run* [r]
+     (fresh [x y]
+       (membero 'e `(~'pasta ~x ~'fagioli ~y))
+       (== `(~x ~y) r)))
+   (lazy-seq '((e _0) (_0 e))))
+;; 还是conde的性质,进入每一个clause都可以认为变量被重新refresh又可以进行新的associate了
+
+(= (run 1 [l]
+     (membero 'tofu l))
+   (lazy-seq `(~(llist 'tofu '_0))))
+;; Every list whose car is tofu.
+
+(comment
+  (run* [l]
+    (membero 'tofu l)))
+;; has no value, because run∗ never finishes building the list.
+
+(= (run 5 [l]
+     (membero 'tofu l))
+   (lazy-seq [(llist 'tofu '_0)
+              (llist '_0 'tofu '_1)
+              (llist '_0 '_1 'tofu '_2)
+              (llist '_0 '_1 '_2 'tofu '_3)
+              (llist '_0 '_1 '_2 '_3 'tofu '_4)]))
+;; Clearly each list satisfies membero , since tofu is in every list.
+
