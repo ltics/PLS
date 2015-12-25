@@ -1014,6 +1014,7 @@
 (= (run* [r]
      (fresh [x y]
        (membero 'e `(~'pasta ~x ~'fagioli ~y))
+       ;; should not use (llist 'pasta x 'fagioli y)
        (== `(~x ~y) r)))
    (lazy-seq '((e _0) (_0 e))))
 ;; 还是conde的性质,进入每一个clause都可以认为变量被重新refresh又可以进行新的associate了
@@ -1037,3 +1038,128 @@
               (llist '_0 '_1 '_2 '_3 'tofu '_4)]))
 ;; Clearly each list satisfies membero , since tofu is in every list.
 
+(defn pmembero
+  "member should be the last item in collection"
+  [x l]
+  (conde
+    ((emptyo l) u#)
+    ((eq-caro l x) (resto l '()))
+    (s# (fresh [d]
+          (resto l d)
+          (pmembero x d)))))
+
+(= (run 5 [l]
+     (pmembero 'tofu l))
+   (lazy-seq ['(tofu)
+              '(_0 tofu)
+              '(_0 _1 tofu)
+              '(_0 _1 _2 tofu)
+              '(_0 _1 _2 _3 tofu)]))
+
+(= (run* [q]
+     (pmembero 'tofu '(a b tofu d tofu))
+     (== true q))
+   (lazy-seq '(true)))
+
+;; redefine pmembero
+(defn pmembero*
+  [x l]
+  (conde
+    ;; the first line can be removed
+    ((emptyo l) u#)
+    ((eq-caro l x) (resto l '()))
+    ((eq-caro l x) s#)
+    (s# (fresh [d]
+          (resto l d)
+          (pmembero* x d)))))
+
+(= (run* [q]
+     (pmembero* 'tofu '(a b tofu d tofu))
+     (== true q))
+   (lazy-seq '(true true true)))
+;; The second conde line contributes a value because there is a tofu at the end of the list.
+;; Then the third conde line contributes a value for the first tofu in the list and it contributes a value for the second tofu in the list.
+;; Thus in all, three values are contributed.
+
+;; redefine pmembero again
+(defn pmembero**
+  [x l]
+  (conde
+    ((emptyo l) u#)
+    ((eq-caro l x) (resto l '()))
+    ((eq-caro l x)
+      (fresh [a d]
+        ;;to make sure that its cdr is not the empty list.
+        (resto l (lcons a d))))
+    (s#
+      (fresh [d]
+        (resto l d) (pmembero** x d)))))
+
+(= (run* [q]
+     (pmembero** 'tofu '(a b tofu d tofu))
+     (== true q))
+   (lazy-seq '(true true)))
+
+(= (run 12 [l]
+     (pmembero 'tofu l))
+   (lazy-seq ['(tofu)
+              '(_0 tofu)
+              '(_0 _1 tofu)
+              '(_0 _1 _2 tofu)
+              '(_0 _1 _2 _3 tofu)
+              '(_0 _1 _2 _3 _4 tofu)
+              '(_0 _1 _2 _3 _4 _5 tofu)
+              '(_0 _1 _2 _3 _4 _5 _6 tofu)
+              '(_0 _1 _2 _3 _4 _5 _6 _7 tofu)
+              '(_0 _1 _2 _3 _4 _5 _6 _7 _8 tofu)
+              '(_0 _1 _2 _3 _4 _5 _6 _7 _8 _9 tofu)
+              '(_0 _1 _2 _3 _4 _5 _6 _7 _8 _9 _10 tofu)]))
+
+(= (run 12 [l]
+     (pmembero** 'tofu l))
+   (lazy-seq ['(tofu)
+              (llist 'tofu '_0 '_1)
+              '(_0 tofu)
+              (llist '_0 'tofu '_1 '_2)
+              '(_0 _1 tofu)
+              (llist '_0 '_1 'tofu '_2 '_3)
+              '(_0 _1 _2 tofu)
+              (llist '_0 '_1 '_2 'tofu '_3 '_4)
+              '(_0 _1 _2 _3 tofu)
+              (llist '_0 '_1 '_2 '_3 'tofu '_4 '_5)
+              '(_0 _1 _2 _3 _4 tofu)
+              (llist '_0 '_1 '_2 '_3 '_4 'tofu '_5 '_6)]))
+
+(defn pmembero***
+  [x l]
+  (conde
+    ((emptyo l) u#)
+    ((eq-caro l x)
+      (fresh [a d]
+        (resto l (lcons a d))))
+    ((eq-caro l x) (resto l '()))
+    (s#
+      (fresh [d]
+        (resto l d) (pmembero*** x d)))))
+
+(= (run 12 [l]
+     (pmembero*** 'tofu l))
+   (lazy-seq [(llist 'tofu '_0 '_1)
+              '(tofu)
+              (llist '_0 'tofu '_1 '_2)
+              '(_0 tofu)
+              (llist '_0 '_1 'tofu '_2 '_3)
+              '(_0 _1 tofu)
+              (llist '_0 '_1 '_2 'tofu '_3 '_4)
+              '(_0 _1 _2 tofu)
+              (llist '_0 '_1 '_2 '_3 'tofu '_4 '_5)
+              '(_0 _1 _2 _3 tofu)
+              (llist '_0 '_1 '_2 '_3 '_4 'tofu '_5 '_6)
+              '(_0 _1 _2 _3 _4 tofu)]))
+
+;; with pmembero** All of the odd positions are proper lists.
+;; Because in the second conde line the cdr of l is the empty list.
+;; the third conde line the cdr of l is a pair.
+;; with pmembero*** All of the odd positions are proper lists.
+;; Because in the third conde line the cdr of l is the empty list.
+;; the second conde line the cdr of l is a pair.
