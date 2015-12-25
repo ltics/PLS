@@ -1,5 +1,5 @@
 (ns clojure-pl.logic.trs
-  (:refer-clojure :exclude [== reify inc])
+  (:refer-clojure :exclude [== reify inc identity])
   (:use [clojure.core.logic]))
 
 ;; 一个relation或者"目标"(函数的关系式对应物)不区分参数与返回值 firsto resto conso
@@ -930,3 +930,58 @@
 (defn loto
   [l]
   (listofo twinso l))
+
+(defn eq-caro
+  [l x]
+  (firsto l x))
+
+(defn membero2
+  [x l]
+  (conde
+    ((emptyo l) u#)
+    ((eq-caro l x) s#)
+    (s# (fresh [d]
+          (resto l d)
+          (membero2 x d)))))
+
+(= (run* [q]
+     (membero 'olive '(virgin olive oil))
+     (== true q))
+   (lazy-seq '(true)))
+
+(= (run 1 [y]
+     (membero y '(hummus with pita)))
+   (lazy-seq '(hummus)))
+
+(= (run 2 [y]
+     (membero y '(hummus with pita)))
+   (lazy-seq '(hummus with)))
+;; because we can ignore the first conde line since l is not the empty list,
+;; and because the second conde line associates the fresh variable y with the value of (car l), which is hummus.
+
+(= (run* [y]
+     (membero y '()))
+   (lazy-seq '()))
+;; because the (nullo l) question of the first conde line now holds, resulting in failure of the goal (membero y l).
+
+(= (run* [y]
+     (membero y '(hummus with pita)))
+   (lazy-seq '(hummus with pita)))
+;; since we already know the value of each recursive call to membero, provided y is fresh.
+;; Since we pretend that the second conde line has failed, we also get to assume that y has been refreshed.
+;; y is a fresh variable each time we enter membero recursively
+;; conde的准则就是进入到每一个条件的时候都假定之前的clause是失败的, 然后重新对fresh variable进行associate
+
+;; So is the value of
+(comment
+  (run* (y)
+    (membero y l)))
+;; always the value of l
+
+(defn identity
+  [l]
+  (run* [y]
+    (membero y l)))
+
+(= (identity '(hummus with pita))
+   (lazy-seq '(hummus with pita)))
