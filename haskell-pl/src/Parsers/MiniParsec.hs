@@ -95,4 +95,21 @@ char c = satisfied (c ==)
 
 string :: String -> Parser String
 string "" = return ""
-string (c:cs) = do {char c; string cs; return (c:cs)}
+string (c:cs) = do { char c; string cs; return (c:cs) }
+
+-- 0 or more applications of Parser p
+many0 :: Parser a -> Parser [a]
+many0 p = many1 p `option` return []
+
+-- 1 or more applications of Parser p
+many1 :: Parser a -> Parser [a]
+many1 p = do { a<- p; as <- many0 p; return (a:as) }
+
+--sepBy
+sepBy0 :: Parser a -> Parser b -> Parser [a]
+p `sepBy0` sep = (p `sepBy1` sep) `option` return []
+
+sepBy1 :: Parser a -> Parser b -> Parser [a]
+p `sepBy1` sep = do a <- p
+                    as <- many0 $ do {sep; p}
+                    return (a:as)
