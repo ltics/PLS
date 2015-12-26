@@ -63,6 +63,7 @@ instance Monad Parser where
     return a = Parser (\s -> [(a, s)])
     p >>= f = Parser (\s -> parse p s |>
                             map (\(a, s') -> parse (f a) s') |>
+                            -- concat [[]] => []
                             concat)
 
 -- MonadPlus has similar semantic with Monoid
