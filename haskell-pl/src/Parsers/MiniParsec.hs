@@ -114,3 +114,24 @@ sepBy1 :: Parser a -> Parser b -> Parser [a]
 p `sepBy1` sep = do a <- p
                     as <- many0 $ do {sep; p}
                     return (a:as)
+
+space :: Parser String
+space = many0 (satisfied isSpace)
+        -- in haskell '' quote a char and "" quote a string
+    where isSpace ' '  = True
+          isSpace '\n' = True
+          isSpace '\t' = True
+          isSpace _    = False
+
+
+token :: Parser a -> Parser a
+token p = do { a <- p; space ; return a }
+
+symbol :: String -> Parser String
+symbol s = token $ string s
+
+digit :: Parser Char
+digit = satisfied isDigit
+
+number :: Parser Int
+number = do { cs <- many1 digit; return $ read cs }
