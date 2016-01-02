@@ -4,6 +4,7 @@ likes(sally, dan).
 likes(josh, brittney).
 
 /*rules*/
+/*variable should be capitalized*/
 dating(X, Y) :-
 likes(X, Y),
 likes(Y, X).
@@ -16,5 +17,5 @@ likes(Y, X).
 If  -> :-
 And -> ,
 OR  -> ;
-NOT -> not 
+NOT -> not
 */
