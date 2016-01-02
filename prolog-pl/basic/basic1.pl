@@ -19,3 +19,12 @@ And -> ,
 OR  -> ;
 NOT -> not
 */
+
+/*
+['absolute file path'].
+likes(dan, sally). => true.
+likes(black, josh). => false.
+dating(dan, sally). => true.
+dating(josh, brittney). => false.
+friendship(josh, brittney). => true .
+*/
