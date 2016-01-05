@@ -28,3 +28,10 @@ dating(dan, sally). => true.
 dating(josh, brittney). => false.
 friendship(josh, brittney). => true .
 */
+
+/*facts => weather(City, Season, Temp)*/
+/*if a query has multi result just press whitespace not enter*/
+weather(phoenix, summer, hot).
+weather(la, summer, warm).
+weather(phoenix, winter, warm).
+weather(cali, spring, warm).
