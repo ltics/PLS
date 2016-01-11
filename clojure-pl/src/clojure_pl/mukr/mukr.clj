@@ -1,6 +1,7 @@
-(ns clojure-pl.mk.mukr
+(ns clojure-pl.mukr.mukr
   (:require [clojure.string :as string])
-  (:import [clojure.lang Seqable]))
+  (:import [clojure.lang Seqable])
+  (:refer-clojure :exclude [== conj disj cons list list? take]))
 
 ;; we just need a idiomic cons just like scheme in the old way
 ;; in scheme cons can construct a pair or list
@@ -26,11 +27,15 @@
   Seqable
   (seq [self] (seq-cons-list self)))
 
+(defn list? [v]
+  (instance? Cons v))
+
 (defn proper-list? [cell]
   (or (nil? cell)
       (and (list? cell)
            (proper-list? (cdr cell)))))
 
 (defn seq-cons-list [cell]
-  (when-not (nil? cell)
+  (when (and (some? cell)
+             (proper-list? cell))
     (clojure.core/cons (car cell) (cdr cell))))
